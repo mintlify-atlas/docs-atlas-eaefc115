@@ -1,0 +1,160 @@
+---
+title: "Generate AI Ad Images from Campaign Brief"
+description: "Run /ads generate to turn campaign-brief.md into platform-sized ad images with 3 variants per brief, a vision quality gate, and consistency anchoring."
+---
+
+`/ads generate` is the third step of the creative pipeline. It reads `campaign-brief.md` (from `/ads create`) and `brand-profile.json` (from `/ads dna`), then spawns the `visual-designer` agent to generate platform-sized ad images for every brief in the document. A quality gate scores each image via Claude vision and auto-regenerates anything below a 6. Output lands in `ad-assets/`.
+
+## Usage
+
+```bash
+/ads generate
+```
+
+```bash
+# Generate assets for one platform only
+/ads generate --platform meta
+
+# Standalone generation without a campaign brief
+/ads generate --prompt "minimalist product shot, white background" --ratio 4:5
+```
+
+## Environment setup
+
+`/ads generate` uses [banana-claude](https://github.com/AgriciDaniel/banana-claude) as its default image generation layer. Run `/banana setup` to configure it before your first generation.
+
+<Tabs>
+  <Tab title="Gemini (default)">
+    ```bash
+    # Set in your shell profile
+    export GOOGLE_API_KEY=your_key_here
+    ```
+    Uses Gemini via banana-claude. Recommended — supports brand presets, 9 domain modes, and cost tracking.
+  </Tab>
+  <Tab title="OpenAI">
+    ```bash
+    export ADS_IMAGE_PROVIDER=openai
+    export OPENAI_API_KEY=your_key_here
+    ```
+    Uses `gpt-image-1`. ~$0.040/image (1024×1024), ~$0.060 (1024×1536). Requires `openai>=1.75.0`.
+  </Tab>
+  <Tab title="Stability AI">
+    ```bash
+    export ADS_IMAGE_PROVIDER=stability
+    export STABILITY_API_KEY=your_key_here
+    ```
+    Uses Stable Diffusion 3.5 Large. ~$0.065/image flat. Requires `stability-sdk>=0.8.4`.
+  </Tab>
+  <Tab title="Replicate">
+    ```bash
+    export ADS_IMAGE_PROVIDER=replicate
+    export REPLICATE_API_TOKEN=your_key_here
+    ```
+    Uses FLUX.1 Pro. ~$0.055/image. Requires `replicate>=1.0.4`.
+  </Tab>
+</Tabs>
+
+<Warning>
+  If no API key is configured, `/ads generate` displays setup instructions and exits. It never fails silently or produces placeholder images.
+</Warning>
+
+## How generation works
+
+### 1. Source files
+
+The command reads:
+- `campaign-brief.md` → the `## Image Generation Briefs` section provides the job list (prompt, dimensions, aspect ratio, banana domain mode, safe zone notes)
+- `brand-profile.json` → `colors.primary`, `aesthetic.mood_keywords`, and `imagery.forbidden` are injected into every prompt
+
+### 2. Brand preset
+
+Before generating, the `visual-designer` agent creates (or activates) a banana brand preset at `~/.banana/presets/{brand-slug}.json` from the brand profile. The preset stores brand colors, visual style, mood keywords, and default resolution so they apply consistently to every generation in the session.
+
+### 3. Visual consistency anchoring
+
+The hero image (the strongest concept's first brief) is generated first. Its file path is saved as the `consistencyAnchor` in `generation-manifest.json`. Every subsequent image in the campaign is passed this hero as a style reference, ensuring all assets share the same color palette, lighting direction, and visual tone.
+
+### 4. 3-variant A/B strategy
+
+For every brief, three variants are generated:
+
+| Variant | Description |
+|---------|-------------|
+| v1 | Base composition — closest to the brief prompt |
+| v2 | Alternative angle or perspective |
+| v3 | Different lighting or mood variation |
+
+Upload all three to your ad platform and rotate them to find the best performer before scaling spend.
+
+### 5. Quality gate
+
+After generation, Claude scores each image 1–10 using vision:
+
+| Score | Meaning | Action |
+|-------|---------|--------|
+| 9–10 | Professional quality, fully brand-aligned | Keep |
+| 7–8 | Good quality, minor improvements possible | Keep |
+| 5–6 | Acceptable but needs work — text readability, composition, or brand mismatch | Auto-regenerate once with adjusted prompt |
+| Below 5 | Reject | Regenerate with adjusted prompt |
+
+Images that score below 6 are regenerated once automatically with a tightened prompt. If the second attempt also fails, the failure is logged in `generation-manifest.json` and reported in the summary.
+
+### 6. Format validation
+
+After the `visual-designer` completes, the `format-adapter` agent validates every image against platform dimension requirements, checks file sizes, and audits safe zone compliance. It writes `format-report.md` with a full results table.
+
+## Output
+
+```
+./ad-assets/
+  meta/
+    pain-point-hook/
+      feed-1080x1350-v1.png
+      feed-1080x1350-v2.png
+      feed-1080x1350-v3.png
+  tiktok/
+    pain-point-hook/
+      vertical-1080x1920-v1.png
+      vertical-1080x1920-v2.png
+      vertical-1080x1920-v3.png
+  google/
+    pain-point-hook/
+      landscape-1200x628-v1.png
+      ...
+generation-manifest.json
+format-report.md
+```
+
+`generation-manifest.json` records every asset path, prompt used, banana domain mode, consistency anchor reference, generation success status, and total creative spend (read from `~/.banana/costs.json`).
+
+## Standalone mode
+
+If no `campaign-brief.md` is found, `/ads generate` enters standalone mode and asks for a prompt, target platform, and optional output filename. Platform dimensions are applied automatically:
+
+| Platform target | Dimensions |
+|----------------|-----------|
+| `meta-feed` | 1080×1350 (4:5) |
+| `meta-reels` | 1080×1920 (9:16) |
+| `tiktok` | 1080×1920 (9:16) |
+| `google-pmax` | 1200×628 (1.91:1) |
+| `linkedin` | 1080×1080 (1:1) |
+| `youtube` | 1280×720 (16:9) |
+| `youtube-short` | 1080×1920 (9:16) |
+
+## Cost transparency
+
+Before generating, the command counts the number of image briefs in `campaign-brief.md`, estimates total cost based on your provider's per-image pricing, and shows you the estimate. If the total exceeds $1.00, it asks for confirmation before proceeding.
+
+<Tip>
+  Gemini via banana supports a Batch API at 50% off standard pricing. For large campaigns with many briefs, batch mode significantly reduces generation cost.
+</Tip>
+
+## Gemini pricing reference
+
+| Resolution | Cost per image | Best for |
+|-----------|---------------|----------|
+| 512px | $0.020 | Quick concept drafts |
+| 1K | $0.039 | Standard web assets |
+| 2K | $0.078 | Quality ad creatives (recommended) |
+| 4K | $0.156 | Print and hero images |
+| Batch API | 50% off | Bulk campaign generation |

@@ -1,0 +1,68 @@
+---
+title: "AI Creative Pipeline for Ad Generation"
+description: "A 4-step sequential pipeline that turns your website into brand-aligned ad creative: extract DNA, write briefs, generate images, and shoot products."
+---
+
+The Claude Ads creative workflow is a 4-step sequential pipeline that takes you from a raw website URL to production-ready, brand-aligned ad creative. Each step builds on the output of the previous one, but every step is also independently runnable so you can enter the pipeline at any point. The pipeline is powered by four specialized AI agents and requires an image generation API key only for the last two steps.
+
+<Note>
+  `/ads creative` is a **creative quality audit** of your existing ads — it scores format diversity, detects fatigue, and reports compliance issues. It is separate from the generation pipeline described on this page. The generation pipeline is `/ads dna` → `/ads create` → `/ads generate`.
+</Note>
+
+## The 4-step pipeline
+
+<Steps>
+  <Step title="/ads dna &lt;url&gt;">
+    Fetches your homepage, about page, and product page, captures screenshots, and extracts your brand DNA into a `brand-profile.json` file. This file is the foundation for everything that follows — colors, typography, voice axes, imagery style, and target audience are all locked in here.
+  </Step>
+  <Step title="/ads create">
+    Reads `brand-profile.json` (and any audit results present in the directory) and spawns the `creative-strategist` and `copy-writer` agents in sequence. The output is `campaign-brief.md` — a complete document with campaign concepts, image generation briefs, and a platform-specific copy deck.
+  </Step>
+  <Step title="/ads generate">
+    Reads `campaign-brief.md` and `brand-profile.json`, then spawns the `visual-designer` agent to generate platform-sized ad images. Every image is scored 1–10 via Claude vision; anything below 6 is automatically regenerated. Output lands in `ad-assets/`.
+  </Step>
+  <Step title="/ads photoshoot">
+    Generates product photography in 5 professional styles (Studio, Floating, Ingredient, In Use, Lifestyle) at 2K resolution. Can run standalone or read `brand-profile.json` for color and mood injection. Output lands in `product-photos/`.
+  </Step>
+</Steps>
+
+## Requirements
+
+The DNA and create steps work without any API key. The generate and photoshoot steps require an image generation provider:
+
+- **Default**: `GOOGLE_API_KEY` — uses Gemini via [banana-claude](https://github.com/AgriciDaniel/claude-banana)
+- **Alternatives**: set `ADS_IMAGE_PROVIDER` to `openai`, `stability`, or `replicate` and provide the matching API key
+
+If no key is configured, `/ads generate` and `/ads photoshoot` display setup instructions and exit cleanly — they never fail silently.
+
+## The 4 creative agents
+
+These agents are spawned automatically by `/ads create` and `/ads generate`. You do not invoke them directly.
+
+<CardGroup cols={2}>
+  <Card title="creative-strategist" icon="lightbulb">
+    Reads brand DNA and optional audit results to generate 3–5 campaign concepts with two visual direction variants each. Writes the strategic sections of `campaign-brief.md`. Runs on Opus with up to 25 turns.
+  </Card>
+  <Card title="copy-writer" icon="pen">
+    Reads the concepts written by `creative-strategist` and appends a platform-specific copy deck to `campaign-brief.md`. Generates 5 headline variants and 3 primary text variants per concept per platform, validated against character limits. Applies one of 6 copy frameworks selected for the campaign. Runs on Sonnet with up to 20 turns.
+  </Card>
+  <Card title="visual-designer" icon="image">
+    Reads the image generation briefs from `campaign-brief.md` and constructs banana 5-component prompts for each asset. Generates a hero image first as a visual consistency anchor, then passes it as a style reference to all subsequent generations. Produces 3 A/B/C variants per brief. Runs on Sonnet with up to 30 turns.
+  </Card>
+  <Card title="format-adapter" icon="ruler">
+    Validates every generated image against platform dimension and file-size requirements, checks safe zone compliance, and writes `format-report.md` with a full pass/fail table and missing-format alerts. Runs on Haiku with up to 15 turns.
+  </Card>
+</CardGroup>
+
+## When to use each step independently
+
+| Scenario | Entry point |
+|----------|-------------|
+| You already have a brand profile from a previous run | Skip to `/ads create` |
+| You have a `campaign-brief.md` but need new images | Skip to `/ads generate` |
+| You need product photos for a landing page, not a campaign | Run `/ads photoshoot` standalone |
+| You want to audit your existing creatives for fatigue and compliance | Run `/ads creative` (separate audit command) |
+
+## The `/ads creative` audit
+
+`/ads creative` is not part of the generation pipeline. It is a cross-platform creative quality audit that scores your existing ad accounts across 10 checks (format diversity, fatigue signals, platform compliance, refresh cadence, and creative volume). It produces `CREATIVE-AUDIT-REPORT.md` with a graded health score and a production priority list. Running it before `/ads create` gives the `creative-strategist` agent audit context so that new concepts directly address your weakest areas.

@@ -1,0 +1,192 @@
+---
+title: "Strategic Ad Planning by Business Type"
+description: "Generate an industry-specific ad strategy with platform selection, campaign architecture, budget allocation, and a 12-week phased implementation roadmap."
+---
+
+Running `/ads plan <business-type>` produces a full advertising strategy tailored to your industry. Rather than generic advice, Claude loads the matching industry template, applies the 8-step discovery and planning process, and outputs six ready-to-use documents covering everything from campaign naming conventions to a 12-week launch roadmap. Provide a business type and your context (monthly budget, goals, active platforms) and Claude handles the rest.
+
+## Command
+
+```bash
+/ads plan <business-type>
+```
+
+**Example:**
+
+```bash
+/ads plan saas
+/ads plan ecommerce
+/ads plan local-service
+```
+
+## Supported business types
+
+<CardGroup cols={3}>
+  <Card title="saas" icon="cloud">
+    Trial and demo focus. Google Search captures high-intent queries; LinkedIn targets decision-makers by title and company. Optimizes for pipeline ROI and LTV:CAC.
+  </Card>
+  <Card title="ecommerce" icon="shopping-cart">
+    Shopping and PMax-led, ROAS-focused, with seasonal budget adjustments. Meta Advantage+ Sales for prospecting at scale; TikTok Shop for product discovery.
+  </Card>
+  <Card title="local-service" icon="map-pin">
+    Google Search and Local Services Ads as the primary channels. Call tracking is mandatory. Geo radius targeting of 10–20 miles. Pay-per-lead via LSA.
+  </Card>
+  <Card title="b2b-enterprise" icon="building">
+    LinkedIn ABM with tiered account targeting, Thought Leader Ads, and long 90-day attribution windows. Pipeline generated matters more than lead volume.
+  </Card>
+  <Card title="info-products" icon="graduation-cap">
+    Meta and YouTube drive webinar and VSL funnels. Audience warm-up sequences, lead magnet offers, and email integration are central to the funnel strategy.
+  </Card>
+  <Card title="mobile-app" icon="smartphone">
+    Meta and Google UAC for installs; an MMP (AppsFlyer, Adjust) is required for attribution. Primary metrics are CPI, LTV, and D7 retention rate.
+  </Card>
+  <Card title="real-estate" icon="home">
+    Operates under Special Ad Category (Housing), which restricts demographic targeting. Separate buyer and seller campaigns with lead form extensions and listing feeds.
+  </Card>
+  <Card title="healthcare" icon="heart-pulse">
+    HIPAA compliance governs all audience data use. LegitScript certification required for addiction treatment and pharmacy. Restricted targeting on Meta and Google.
+  </Card>
+  <Card title="finance" icon="landmark">
+    Special Ad Category (Credit) applies to loans, mortgages, and credit cards. Required disclosures (APR, NMLS, FDIC) must appear in every ad and landing page.
+  </Card>
+  <Card title="agency" icon="briefcase">
+    Multi-client management framework with white-label reporting. Platform mix varies by client vertical; performance reporting is structured for client delivery.
+  </Card>
+  <Card title="generic" icon="layout-template">
+    Universal template for businesses that don't fit a specific vertical. Begins with a platform selection questionnaire to determine the right channel mix.
+  </Card>
+</CardGroup>
+
+## Planning process
+
+Claude follows an 8-step process for every plan it generates. Each step builds on the previous so the final output is internally consistent.
+
+<Steps>
+  <Step title="Discovery">
+    Collect business type, products and services, target audience, current advertising status (active platforms, spend, performance), goals (sales, leads, installs, calls), budget range, timeline, and in-house capacity versus agency needs.
+  </Step>
+  <Step title="Competitive analysis">
+    Identify three to five competitors. Analyze their ad presence across platforms using Google Ads Transparency Center and Meta Ad Library. Estimate spend levels, platform mix, and messaging themes. Surface keyword and audience gaps that competitors are missing.
+  </Step>
+  <Step title="Platform selection">
+    Load the industry template and match the business type to a recommended platform mix. Apply the platform selection matrix from the budget allocation reference. Assess audience demographics per platform, product suitability, budget minimums, sales cycle length, and creative capabilities.
+  </Step>
+  <Step title="Campaign architecture">
+    Design full account structure using the naming convention and campaign hierarchy below. Includes brand defense, non-brand prospecting at every funnel stage, retargeting, and a dedicated testing bucket.
+  </Step>
+  <Step title="Budget planning">
+    Distribute budget across platforms and apply the 70/20/10 framework. Set pacing expectations for the first six months of the campaign lifecycle.
+  </Step>
+  <Step title="Creative strategy">
+    Define five content pillars (Pain Point, Social Proof, Product Demo, Offer, Education) and build a creative production plan with asset types, quantities, and platform priorities.
+  </Step>
+  <Step title="Tracking setup">
+    Verify client-side and server-side tracking is in place before launch. Covers Google Enhanced Conversions, Meta CAPI, LinkedIn CAPI, TikTok Events API, and Microsoft UET.
+  </Step>
+  <Step title="Implementation roadmap">
+    Produce a phased 12-week rollout plan with specific milestones and decision points at each phase.
+  </Step>
+</Steps>
+
+## Campaign naming convention
+
+Every campaign Claude creates follows a consistent naming pattern for easy filtering and reporting:
+
+```
+[Platform]_[Objective]_[Audience]_[Geo]_[Date]
+```
+
+**Example:** `META_CONV_Prospecting_US_2026Q1`
+
+The resulting account structure uses a four-tier hierarchy:
+
+```
+Account
+├── Brand Campaign (always-on; protect brand terms)
+├── Non-Brand Prospecting
+│   ├── Campaign 1: Top Funnel – Awareness
+│   ├── Campaign 2: Mid Funnel – Consideration
+│   └── Campaign 3: Bottom Funnel – Conversion
+├── Retargeting
+│   ├── Website Visitors (7–30 days)
+│   ├── Engaged Users (video views, social engagement)
+│   └── Cart Abandoners / Form Starters
+└── Testing
+    └── New audiences, formats, or messaging
+```
+
+## Budget framework
+
+Claude applies the 70/20/10 rule to every budget plan it produces.
+
+| Tier | Allocation | Purpose |
+|------|-----------|---------|
+| Proven | 70% | Primary platforms with consistent ROAS or CPA targets met |
+| Scaling | 20% | Platforms showing traction that need more data |
+| Testing | 10% | New platforms, audiences, or creative formats |
+
+<Note>
+  Budget pacing expectations: Months 1–2 are heavy testing with higher CPA (learning phase). Months 3–4 optimize based on data. Months 5–6 scale winners and kill losers. Ongoing cadence follows 70/20/10 with quarterly reviews.
+</Note>
+
+## Implementation roadmap
+
+<Steps>
+  <Step title="Phase 1: Foundation (Weeks 1–2)">
+    Install all tracking pixels and configure server-side tracking. Set up conversion events and goals in each platform. Create campaign structure and apply naming conventions. Build initial audiences: custom lists, lookalike or predictive audiences. Produce the first batch of creative assets across priority formats.
+  </Step>
+  <Step title="Phase 2: Launch (Weeks 3–4)">
+    Launch campaigns on the primary platform first. Set conservative budgets and use Maximize Clicks or Lowest Cost bidding to accumulate data. Monitor daily for the first seven days. Verify that every conversion event is firing correctly before scaling spend.
+  </Step>
+  <Step title="Phase 3: Optimize (Weeks 5–8)">
+    Analyze initial data (minimum two weeks required). Adjust bidding strategies once conversion volume supports Smart Bidding thresholds. Apply the 3x Kill Rule: pause any ad group or campaign with CPA greater than 3x target. Launch secondary platforms. Begin A/B testing on creative, landing pages, and audiences.
+  </Step>
+  <Step title="Phase 4: Scale (Weeks 9–12)">
+    Increase budgets on winning campaigns following the 20% rule (never more than 20% at a time). Expand to testing platforms using the 10% budget allocation. Implement advanced strategies: ABM, Shopping feeds, Smart+, Thought Leader Ads. Establish monthly performance review cadence.
+  </Step>
+</Steps>
+
+## Tracking setup plan
+
+Claude generates a tracking implementation checklist as part of every plan.
+
+| Platform | Client-side | Server-side | Priority |
+|----------|------------|-------------|----------|
+| Google | gtag.js | Enhanced Conversions, GTM Server-Side | P1 |
+| Meta | Pixel | Conversions API (CAPI) | P1 |
+| LinkedIn | Insight Tag | CAPI (2025) | P2 |
+| TikTok | Pixel | Events API + ttclid | P2 |
+| Microsoft | UET Tag | Enhanced Conversions | P2 |
+
+<Warning>
+  Claude will not make optimization recommendations until the privacy infrastructure gate passes. This means verifying Consent Mode V2, CAPI, Events API, and AdAttributionKit (for mobile) are all correctly implemented before any spend analysis begins.
+</Warning>
+
+## Output files
+
+After running `/ads plan`, Claude writes six Markdown documents to your working directory:
+
+| File | Contents |
+|------|----------|
+| `ADS-STRATEGY.md` | Complete strategic advertising plan with goals, platform rationale, and KPI targets |
+| `CAMPAIGN-ARCHITECTURE.md` | Full account structure with naming conventions and ad group hierarchy |
+| `BUDGET-PLAN.md` | Monthly budget allocation with 70/20/10 split and pacing schedule |
+| `CREATIVE-BRIEF.md` | Creative production plan with asset types, quantities, and platform specs |
+| `TRACKING-SETUP.md` | Tracking implementation checklist per platform |
+| `IMPLEMENTATION-ROADMAP.md` | Phased 12-week rollout timeline with milestones |
+
+## KPI targets
+
+Claude sets benchmark targets that evolve across the first year.
+
+| Metric | Month 1 | Month 3 | Month 6 | Month 12 |
+|--------|---------|---------|---------|----------|
+| ROAS | Baseline | Target −20% | Target | Target +20% |
+| CPA | Baseline | Target +30% | Target | Target −10% |
+| CVR | Baseline | +10% | +20% | +30% |
+| CTR | Baseline | +15% | +25% | +30% |
+| Budget stage | Testing | Optimizing | Scaling | Maintaining |
+
+<Tip>
+  For SaaS and B2B businesses with long sales cycles, always track pipeline value and MQL-to-SQL rate alongside CPA. Platform-reported conversions are a lagging indicator of true business impact for these verticals.
+</Tip>

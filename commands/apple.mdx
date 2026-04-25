@@ -1,0 +1,233 @@
+---
+title: "Apple Ads Deep Analysis with /ads apple"
+description: "Audit 35+ Apple Ads checks across campaign structure, Custom Product Pages, Maximize Conversions bidding, AdAttributionKit, and TAP placement coverage."
+---
+
+The `/ads apple` command runs a full Apple Ads audit for mobile app advertisers on the App Store. It evaluates 35+ checks across seven weighted categories—campaign structure, bid health, Custom Product Pages (CPPs), attribution and MMP integration, budget pacing, placement type coverage, and goal KPI performance—and produces an `APPLE-ADS-REPORT.md` with an ASA Health Score. Apple Ads rebranded from "Apple Search Ads" in April 2025, and v1.5 reflects significant platform changes: Creative Sets are fully deprecated, Maximize Conversions bidding reached general availability in February 2026, and AdAttributionKit introduced dual attribution in April 2025.
+
+<Note>
+  Apple rebranded "Apple Search Ads" to **Apple Ads** in April 2025. This documentation and the audit output use the new name. The abbreviation "ASA" is still widely used in the industry.
+</Note>
+
+## Scope
+
+`/ads apple` covers all four Apple Ads placement types and their associated campaign structures:
+
+- Search Results (highest-intent placement; required for all accounts)
+- Search Tab (discovery and mid-funnel reach)
+- Today Tab (brand awareness; recommended only for budgets >$3K/month)
+- Product Pages (competitor conquesting and related app targeting)
+- Maximize Conversions bidding (GA February 26, 2026)
+- Custom Product Pages (up to 70 per app since October 2025)
+- AdAttributionKit dual attribution (SKAN + AdServices API)
+
+## Category breakdown and weights
+
+<Tabs>
+  <Tab title="Campaign Structure — 25%">
+    **Bottom, middle, and top funnel evaluated**
+
+    Campaign architecture determines how effectively Apple Ads can allocate budget and bid across intent levels. Mixing match types or objectives in a single campaign prevents optimization.
+
+    **Bottom of funnel (Search Results, Exact Match):**
+    - Brand keyword campaign active (own app name and common misspellings)
+    - Competitor campaign active (competitor app names as keywords)
+    - Category campaigns targeting high-intent generic terms (e.g., "workout app", "budget tracker")
+
+    **Middle of funnel (Search Match / broad discovery):**
+    - Search Match campaigns active in at least one ad group for discovery
+    - Search Match ad groups isolated from Exact Match (never mix in the same ad group)
+    - Search Terms Report reviewed regularly to promote converting queries to Exact Match campaigns
+
+    **Campaign architecture rules:**
+    - Brand, Category, and Competitor campaigns must be separate (different CPT bids, different budgets)
+    - Goal: let Search Match discover converting queries, then promote winners to Exact Match campaigns
+    - Search Results placement must be active; it is the highest-intent surface on the App Store
+
+    <Warning>
+      Mixing Search Match and Exact Match ad groups in the same ad group is a Critical failure. Search Match discovery queries will inflate CPT for Exact Match terms, and the algorithm cannot optimize bids independently.
+    </Warning>
+  </Tab>
+  <Tab title="Bid Health — 20%">
+    **CPT benchmarks, match type differentiation, and Maximize Conversions**
+
+    | Check | Description | Severity |
+    |-------|-------------|----------|
+    | CPT vs category benchmark | Cost Per Tap within expected range for app category | High |
+    | TTR benchmark | Tap-Through Rate ≥2.5% (Search Results), ≥1.5% (Search Tab) | High |
+    | Install CVR benchmark | 50–65% for brand terms, 20–40% for category terms | High |
+    | Maximize Conversions evaluation | AI auto-bidder evaluated or active for eligible accounts | Medium |
+    | Keyword-level CPT bids | CPT bids set at keyword level, not only at ad group default | Medium |
+    | Match type bid differentiation | Brand Exact > Category Exact > Search Match | High |
+    | Negative keywords from Search Match | Irrelevant search terms identified and excluded | High |
+    | Low-performing keyword management | TTR &lt;1% + high CPT keywords paused or reduced | Medium |
+
+    **Maximize Conversions bidding** reached general availability on February 26, 2026. It uses Search Match to set optimal bids per search query in real time.
+
+    - Target CPA replaces CPA Cap (CPA Cap is being deprecated)
+    - Recommended daily budget: ≥5× target CPA
+    - Learning period: minimum 2 weeks
+    - **Current limitation**: only optimizes for installs, not post-install events (no trial, subscription, or ROAS optimization yet)
+
+    **CPT benchmarks by category (2025–2026):**
+
+    | Category | Avg CPT | Avg TTR | Install CVR | Target CPI |
+    |----------|---------|---------|-------------|------------|
+    | Games | $0.50–$1.00 | 3–5% | 55–70% | $1.00–$3.00 |
+    | Health & Fitness | $1.50–$3.00 | 2–4% | 45–60% | $3.00–$8.00 |
+    | Productivity | $1.00–$2.50 | 2–3.5% | 50–65% | $2.00–$5.00 |
+    | Finance | $2.00–$5.00 | 1.5–3% | 40–55% | $5.00–$15.00 |
+    | Education | $1.00–$2.00 | 2–4% | 50–65% | $2.00–$6.00 |
+    | Shopping | $0.80–$2.00 | 2.5–4% | 45–60% | $2.00–$5.00 |
+  </Tab>
+  <Tab title="Custom Product Pages — 15%">
+    **CPPs are now the sole ad variation mechanism; Creative Sets are fully deprecated**
+
+    Custom Product Pages (CPPs) replace Creative Sets, which are fully deprecated. The CPP limit doubled to 70 per app in October 2025.
+
+    | Check | Description | Severity |
+    |-------|-------------|----------|
+    | CPPs created in App Store Connect | At least 3 CPP variants per campaign type | High |
+    | Asset-to-keyword alignment | CPP screenshots match ad group keyword themes | High |
+    | Default store listing optimization | App icon, subtitle, first 3 screenshots compelling and keyword-rich | High |
+    | Preview video present | Video significantly improves TTR | Medium |
+    | CPP performance comparison | Variant with highest TTR and lowest CPI identified | Medium |
+    | Deep links in CPPs | iOS/iPadOS 18+ deep links tested for re-engagement | Low |
+
+    **CPP impact:**
+    - Games: ~8% higher conversion rate
+    - Non-gaming apps: ~6.6% higher conversion rate (AppTweak data)
+    - SoundCloud competitor campaigns with CPPs: 58% CR increase, 39% CPI reduction
+
+    <Warning>
+      78% of App Store search volume comes from devices with Personalized Ads turned off. Demographic audience targeting is therefore largely ineffective. Use creative-based targeting—CPP asset alignment with ad group keyword themes—as the primary differentiation strategy.
+    </Warning>
+
+    CPPs can now be assigned organic keywords (WWDC 2025), bridging paid and organic App Store optimization. Accounts with strong ASO programs should coordinate CPP strategy with their organic keyword targets.
+  </Tab>
+  <Tab title="Attribution & MMP — 15%">
+    **AdAttributionKit dual attribution and MMP integration**
+
+    | Check | Description | Severity |
+    |-------|-------------|----------|
+    | MMP integrated | AppsFlyer, Adjust, Branch, or Singular connected to Apple Ads | Critical |
+    | In-app events sent to Apple Ads | Post-install events enable Maximize Conversions optimization | High |
+    | AdAttributionKit registered | Apple Ads registered with AAK for dual SKAN + AdServices attribution | High |
+    | SKAN conversion values configured | Maps user actions to conversion windows in MMP | High |
+    | ATT opt-in rate monitored | Low ATT rate = less MMP data, more reliance on SKAN/AAK | Medium |
+    | Attribution windows appropriate | 30-day click / 1-day view default; longer for subscription goals | Medium |
+    | Post-install event quality | Purchase, subscription_start, or revenue events tracked | High |
+
+    **AdAttributionKit dual attribution (April 10, 2025):**
+
+    Apple Ads registered with AdAttributionKit (SKAN v1–3), creating dual attribution for the first time. Installs now report through both SKAN/AAK postbacks AND the AdServices API simultaneously.
+
+    WWDC 2025 additions:
+    - Configurable attribution windows
+    - Overlapping re-engagement windows
+    - Country codes in postbacks
+
+    Without MMP integration, post-install optimization—including Maximize Conversions—cannot access the event signals it needs to optimize bids. This is the highest-impact missing piece for accounts spending >$1K/month.
+  </Tab>
+  <Tab title="Budget Pacing — 10%">
+    **Daily cap management and spend efficiency**
+
+    Apple Ads budget pacing is daily, not monthly. Daily caps must be set at the campaign level. Budget management differs meaningfully from other platforms.
+
+    | Check | Description | Severity |
+    |-------|-------------|----------|
+    | Daily cap set appropriately | Not consistently hitting cap (could be missing volume) | High |
+    | Underspend flag | Spend &lt;50% of daily cap (creative or bid issue, not budget) | Medium |
+    | Budget split by placement | Aligned with placement performance data | Medium |
+    | Lifetime budget end dates | Correct end date and pacing curve if lifetime budgets used | Medium |
+
+    Consistently hitting the daily cap = opportunity cost; the account is likely leaving installs on the table. Consistently underspending (&lt;50% of cap) = a bid or creative quality issue; increasing budget will not help until the underlying cause is resolved.
+  </Tab>
+  <Tab title="TAP Coverage — 10%">
+    **Placement type evaluation across all four surfaces**
+
+    | Placement | Where | Best for | Benchmark CPT |
+    |-----------|-------|----------|----------------|
+    | Search Results | Below search results | High intent, BOFU | $0.50–$3.00 |
+    | Search Tab | Top of Search tab | Discovery, MOFU | $0.30–$1.50 |
+    | Today Tab | App Store home page | Brand awareness | $1.00–$5.00 |
+    | Product Pages | Competitor/related app pages | Competitor conquesting | $0.50–$2.00 |
+
+    **Evaluation rules:**
+    - Search Results must be active (highest-intent placement; failure if absent)
+    - Search Tab: evaluate CPT and TTR vs Search Results; active if budget supports scale
+    - Today Tab: only recommended for budgets >$3K/month with brand awareness as a goal; high CPT, lower intent
+    - Product Pages: evaluate if competitor CPPs are being targeted; strong conquesting opportunity
+  </Tab>
+  <Tab title="Goal KPI Assessment — 5%">
+    **CPI vs target, trend direction, and revenue event tracking**
+
+    | Check | Description | Severity |
+    |-------|-------------|----------|
+    | Actual CPI vs target CPI | Flag if actual CPI >2× target from MMP | High |
+    | CPI trend over 30 days | Improving or worsening? Directional flag | Medium |
+    | ROAS positive in MMP window | Revenue events attributed within lookback window | High |
+
+    **Country tier context:**
+    - **Tier 1** (US, UK, AU, CA, JP): CPT 2–3× above global average; highest LTV
+    - **Tier 2** (DE, FR, KR, SG, HK): CPT 1–1.5× above global average
+    - **Tier 3** (BR, IN, MX): CPT 30–60% below Tier 1; high volume, lower LTV
+
+    International markets often deliver 3–5× better CPI than the US with comparable LTV for subscription apps. The audit flags accounts spending exclusively in Tier 1 without evaluating international expansion.
+  </Tab>
+</Tabs>
+
+## Platform benchmarks (SplitMetrics 2025)
+
+| Metric | Search Results average |
+|--------|----------------------|
+| Tap-Through Rate (TTR) | 9.7% |
+| Conversion Rate (tap → install) | 66.2% |
+| Cost Per Tap (CPT) | $2.25 |
+| Cost Per Acquisition (CPA) | $3.76 |
+
+The US is the highest-cost market. AMEI (Africa, Middle East, India) is the most cost-efficient and stable market for volume-driven campaigns.
+
+## v1.5 platform changes
+
+| ID | Check | Severity | Notes |
+|----|-------|----------|-------|
+| ASA-MA1 | Multiple ads per query readiness | Medium | Up to 2 ads per search query rolling out March 2026 (was 1). Changes competitive dynamics—more real estate, higher competition. Evaluate bid strategy. |
+
+**Deprecated as of v1.5:**
+- **Creative Sets**: Fully deprecated. Only CPPs now (up to 70 per app)
+- **CPA Cap**: Being retired; replaced by Target CPA via Maximize Conversions
+- **Demographic audience targeting as primary strategy**: 78% of App Store search volume is from devices with Personalized Ads off
+
+## Data needed
+
+If not provided upfront, the audit requests:
+
+- Campaign list with spend, installs, CPT, TTR, and CVR for the last 30 days
+- Active placement types (Search Results, Search Tab, Today Tab, Product Pages)
+- MMP in use (AppsFlyer, Adjust, Branch, Singular, or none)
+- Target CPI/CPA and app category
+- Countries and regions active
+- Whether Custom Product Pages are set up in App Store Connect
+
+## Quick wins
+
+| Check | Fix | Time |
+|-------|-----|------|
+| CPP creation | Create 3 CPP variants per campaign type in App Store Connect | 15 min |
+| Negative keywords | Add irrelevant search terms from Search Match as negatives | 10 min |
+| Keyword-level CPT bids | Set keyword-level bids on top 10 keywords | 10 min |
+| MMP connection | Connect MMP partner within Apple Ads dashboard | 10 min |
+| Search Match isolation | Move Search Match ad groups into separate campaigns | 10 min |
+| Maximize Conversions | Evaluate eligibility (requires installs data + MMP connected) | 5 min |
+
+## Output
+
+Running `/ads apple` produces:
+
+- **`APPLE-ADS-REPORT.md`**: Full 35+ check findings organized by the seven weighted categories with pass/warning/fail for each check
+- **ASA Health Score (0–100)**: Weighted score with letter grade using the standard A/B/C/D/F scale
+- **CPP audit**: Which variants are live, which are underperforming, and which keyword themes lack aligned creative
+- **Attribution gap analysis**: MMP integration status, AdAttributionKit registration, SKAN conversion value configuration
+- **Placement coverage map**: Spend and performance by placement type with budget reallocation recommendations
+- **Quick Wins**: Sorted by severity × estimated impact

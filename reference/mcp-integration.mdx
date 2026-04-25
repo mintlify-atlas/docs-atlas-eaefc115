@@ -1,0 +1,155 @@
+---
+title: "Live Ad Data via MCP Server Integration"
+description: "Connect Claude Ads to live ad platform APIs through MCP servers, eliminating manual exports for Google, Meta, and LinkedIn audit workflows."
+---
+
+By default, Claude Ads works with data you provide manually — CSV exports, screenshots, or metrics pasted directly into the conversation. MCP (Model Context Protocol) integration is an optional layer that enables direct API access to ad platforms, so Claude Ads can pull live account data without any manual export step. All data flows directly between your machine and the ad platform APIs; nothing is routed through an external server.
+
+## Available MCP servers
+
+Three ad platforms have dedicated MCP servers available as of April 2026. TikTok, Microsoft Ads, and Apple Ads currently require manual exports.
+
+<Tabs>
+  <Tab title="Google Ads">
+    **Server:** `cohnen/mcp-google-ads`
+    **Repository:** [github.com/cohnen/mcp-google-ads](https://github.com/cohnen/mcp-google-ads)
+    **Tools:** 29 GAQL-based tools
+
+    This server gives Claude Ads direct access to Google Ads Query Language (GAQL) endpoints, automating the data collection for most of the 80-check Google audit.
+
+    **What becomes automated:**
+    - Search term data for wasted spend checks (G13, G16–G19)
+    - Quality Score data (G20–G25)
+    - Campaign structure (G01–G12)
+    - Conversion tracking status (G42–G49)
+    - PMax asset group data (G31–G34, G-PM1–G-PM6)
+    - Budget and bidding data (G36–G41)
+
+    **What stays manual:**
+    - Landing page analysis (G59–G61) — use `analyze_landing.py`
+    - Creative quality assessment (subjective)
+    - Consent Mode V2 verification (requires GTM or tag audit)
+
+    <Steps>
+      <Step title="Install the server">
+        ```bash
+        pip install mcp-google-ads
+        ```
+        Or clone the repo directly if you need to modify the server.
+      </Step>
+      <Step title="Configure Google Ads API credentials">
+        You need a Developer Token, OAuth2 Client ID and Secret, a Refresh Token, and your MCC (Manager Account) ID. Follow the Google Ads API getting started guide to obtain these.
+      </Step>
+      <Step title="Add to .mcp.json">
+        ```json
+        {
+          "mcpServers": {
+            "google-ads": {
+              "command": "python",
+              "args": ["-m", "mcp_google_ads"],
+              "env": {
+                "GOOGLE_ADS_DEVELOPER_TOKEN": "your-token",
+                "GOOGLE_ADS_CLIENT_ID": "your-client-id",
+                "GOOGLE_ADS_CLIENT_SECRET": "your-client-secret",
+                "GOOGLE_ADS_REFRESH_TOKEN": "your-refresh-token",
+                "GOOGLE_ADS_LOGIN_CUSTOMER_ID": "your-mcc-id"
+              }
+            }
+          }
+        }
+        ```
+      </Step>
+    </Steps>
+  </Tab>
+
+  <Tab title="Meta Ads">
+    **Server:** Adspirer MCP
+    **Documentation:** [adspirer.com](https://www.adspirer.com)
+    **Type:** Commercial MCP server
+
+    Adspirer connects Claude Ads to the Meta Marketing API through a hosted MCP server. Setup requires a sign-up at adspirer.com and connecting your Meta Business Manager account.
+
+    **What becomes automated:**
+    - Campaign performance data for structure checks (M11–M18)
+    - Creative metrics for fatigue detection (M25–M32)
+    - Audience overlap check (M19)
+    - EMQ scores (M04, requires Events Manager access)
+
+    **Alternative (self-hosted):** Use the included `scripts/fetch_meta_ads.py` with Meta Marketing API credentials for a free, local alternative.
+
+    <Steps>
+      <Step title="Sign up at Adspirer">
+        Create an account at adspirer.com and complete the Meta Business Manager connection flow.
+      </Step>
+      <Step title="Add the MCP server config">
+        Follow the configuration instructions in the Adspirer documentation. The server config pattern follows standard MCP conventions.
+      </Step>
+    </Steps>
+  </Tab>
+
+  <Tab title="LinkedIn Ads">
+    **Server options:**
+    - **GrowthSpree MCP:** [growthspreeofficial.com](https://www.growthspreeofficial.com/blogs/connect-linkedin-ads-to-claude-mcp)
+    - **Adzviser MCP:** [adzviser.com/mcp/linkedin-ads](https://adzviser.com/mcp/linkedin-ads)
+
+    Both servers provide campaign data access for LinkedIn Ads analysis. Setup follows standard MCP patterns — connect your LinkedIn Ads account through the respective provider's flow and add the server config to `.mcp.json`.
+
+    **What becomes automated:**
+    - Campaign structure and performance data
+    - Audience size and overlap checks
+    - Lead Gen Form performance metrics
+    - Creative engagement data
+  </Tab>
+</Tabs>
+
+## How the hybrid workflow operates
+
+MCP integration does not require full coverage — you can mix live data from available servers with manual exports for platforms that lack MCP servers.
+
+<Steps>
+  <Step title="Connect available MCP servers">
+    Set up whichever servers are available for your active platforms. Google Ads and Meta are the most impactful for automated data collection.
+  </Step>
+  <Step title="Run /ads audit">
+    Claude Ads auto-detects which MCP data sources are connected and uses them automatically. You do not need to specify which platforms are using live data.
+  </Step>
+  <Step title="Provide manual exports for remaining platforms">
+    For TikTok, Microsoft Ads, and Apple Ads (or any platform without an active MCP server), export CSV reports from the platform dashboards and paste or attach them when prompted.
+  </Step>
+  <Step title="Unified audit and Health Score">
+    Claude Ads merges live API data and manual exports into a single audit. The Ads Health Score is calculated across all platforms regardless of whether the data came from an MCP server or a manual export.
+  </Step>
+</Steps>
+
+## Platforms without MCP servers (as of April 2026)
+
+| Platform | Recommended data source |
+|----------|------------------------|
+| TikTok | TikTok Ads Manager CSV exports |
+| Microsoft Ads | Microsoft Ads Editor exports or Google Ads import data |
+| Apple Ads | Apple Ads dashboard exports |
+
+<Info>
+  The MCP ecosystem evolves quickly. Check the respective platform developer portals for new server availability, particularly for TikTok and Microsoft Ads.
+</Info>
+
+## Privacy and security
+
+<CardGroup cols={2}>
+  <Card title="Data stays local" icon="lock">
+    MCP servers run on your machine. No ad account data is routed through external servers. Data flows directly between your machine and the ad platform APIs.
+  </Card>
+  <Card title="Read-only recommended" icon="eye">
+    Use read-only API credentials for audit purposes. Write access is only needed if you plan to make campaign changes via the API, which requires additional safety protocols.
+  </Card>
+  <Card title="Credential storage" icon="key">
+    Store credentials in `.mcp.json` or environment variables. Never hardcode credentials in scripts or commit them to version control.
+  </Card>
+  <Card title="No silent failures" icon="bell">
+    If an MCP server is unavailable or credentials are misconfigured, Claude Ads will notify you and fall back to requesting manual data rather than proceeding with incomplete information.
+  </Card>
+</CardGroup>
+
+<Note>
+  For complete GAQL field reference, deduplication patterns, and filter scope best practices, see `~/.claude/skills/ads/references/gaql-notes.md` after installation.
+</Note>

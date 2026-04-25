@@ -1,0 +1,133 @@
+---
+title: "Install Claude Ads"
+description: "Four ways to install Claude Ads into Claude Code: plugin marketplace, one-line script for Unix or Windows, or a manual git clone and run."
+---
+
+Claude Ads installs into Claude Code as a local skill. Choose the method that fits your workflow — the plugin marketplace is recommended because it handles version tracking and auto-updates automatically. All methods install the same files to the same locations.
+
+<Info>
+  **Requirements:** Claude Code CLI is the only hard requirement. Python 3.10+ is optional and only needed for landing page analysis (`/ads landing`) and PDF report generation (`/ads report`).
+</Info>
+
+## Installation methods
+
+<Steps>
+  <Step title="Plugin install (recommended)">
+    Open Claude Code and run both commands in sequence:
+
+    ```shell
+    /plugin marketplace add AgriciDaniel/claude-ads
+    /plugin install claude-ads@agricidaniel-claude-ads
+    ```
+
+    This registers Claude Ads as a native plugin with namespace isolation, proper version tracking, and automatic updates when new releases ship.
+  </Step>
+
+  <Step title="One-command install">
+    Paste one line into your terminal. The installer clones the repository, copies all files to the correct Claude Code directories, and optionally installs Python dependencies.
+
+    <Tabs>
+      <Tab title="Unix / macOS / Linux">
+        ```bash
+        curl -fsSL https://raw.githubusercontent.com/AgriciDaniel/claude-ads/main/install.sh | bash
+        ```
+      </Tab>
+      <Tab title="Windows PowerShell">
+        ```powershell
+        irm https://raw.githubusercontent.com/AgriciDaniel/claude-ads/main/install.ps1 | iex
+        ```
+      </Tab>
+    </Tabs>
+  </Step>
+
+  <Step title="Manual install">
+    Clone the repository and run the installer script directly. Use this if you want to inspect the installer before running it or need to install from a specific branch.
+
+    <CodeGroup>
+
+    ```bash Unix / macOS / Linux
+    git clone https://github.com/AgriciDaniel/claude-ads.git
+    cd claude-ads
+    ./install.sh
+    ```
+
+    ```powershell Windows PowerShell
+    git clone https://github.com/AgriciDaniel/claude-ads.git
+    cd claude-ads
+    .\install.ps1
+    ```
+
+    </CodeGroup>
+  </Step>
+</Steps>
+
+## What gets installed
+
+Every installation method copies the same files:
+
+| Component | Count | Location |
+|-----------|-------|----------|
+| Main orchestrator skill | 1 | `~/.claude/skills/ads/` |
+| Sub-skills | 19 | `~/.claude/skills/ads-*/` |
+| Agents (6 audit + 4 creative) | 10 | `~/.claude/agents/` |
+| Reference files | 25 | `~/.claude/skills/ads/references/` |
+| Industry templates | 12 | `~/.claude/skills/ads-plan/assets/` |
+
+<Tip>
+  Industry templates cover SaaS, ecommerce, local service, B2B enterprise, info products, mobile app, real estate, healthcare, finance, agency, and generic business types.
+</Tip>
+
+## Python dependencies (optional)
+
+Python is not required to run audits. It is only needed for two specific features:
+
+| Feature | Command | Dependency |
+|---------|---------|------------|
+| Landing page analysis | `/ads landing` | Python 3.10+, `playwright`, `requests` |
+| PDF report generation | `/ads report` | Python 3.10+, `reportlab`, `matplotlib` |
+
+The installer attempts to run `pip3 install -r requirements.txt` automatically. If pip is not found or the install fails, you can run it manually:
+
+<CodeGroup>
+
+```bash Unix / macOS / Linux
+pip3 install -r ~/.claude/skills/ads/requirements.txt
+```
+
+```powershell Windows PowerShell
+pip install -r "$env:USERPROFILE\.claude\skills\ads\requirements.txt"
+```
+
+</CodeGroup>
+
+<Note>
+  If you do not need landing page analysis or PDF reports, you can skip Python entirely. All audit commands (`/ads audit`, `/ads google`, `/ads meta`, etc.) work without any Python dependencies.
+</Note>
+
+## Verify the installation
+
+Start Claude Code and run any command to confirm the skill loaded correctly:
+
+```shell
+claude
+/ads audit
+```
+
+Claude Ads will respond with context intake questions before requesting your ad data. If the command is not recognized, restart Claude Code and try again.
+
+## Uninstall
+
+<Tabs>
+  <Tab title="Unix / macOS / Linux">
+    ```bash
+    curl -fsSL https://raw.githubusercontent.com/AgriciDaniel/claude-ads/main/uninstall.sh | bash
+    ```
+  </Tab>
+  <Tab title="Windows PowerShell">
+    ```powershell
+    irm https://raw.githubusercontent.com/AgriciDaniel/claude-ads/main/uninstall.ps1 | iex
+    ```
+  </Tab>
+</Tabs>
+
+The uninstaller removes the orchestrator skill, all sub-skills, agents, and reference files from your Claude Code directories. It does not touch Python packages installed via pip.

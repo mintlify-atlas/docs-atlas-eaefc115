@@ -1,0 +1,130 @@
+---
+title: "Claude Ads FAQ"
+description: "Answers to the most common questions about how Claude Ads works, what data it needs, which platforms it supports, and how to get accurate results."
+---
+
+Claude Ads is a Claude Code skill that audits and optimizes paid advertising accounts across all major platforms. These are the questions that come up most often from new users.
+
+<AccordionGroup>
+  <Accordion title="Can Claude Ads log into my ad manager automatically?">
+    No. Claude Ads analyzes data you provide — exports, screenshots, or metrics pasted directly into the conversation. It does not connect to ad platforms automatically and does not store any credentials.
+
+    For optional live API access without manual exports, you can pair Claude Ads with MCP (Model Context Protocol) servers:
+    - **Google Ads:** [mcp-google-ads](https://github.com/cohnen/mcp-google-ads) — 29 GAQL tools
+    - **Meta Ads:** [Adspirer MCP](https://www.adspirer.com) or the included `scripts/fetch_meta_ads.py`
+    - **LinkedIn Ads:** [GrowthSpree MCP](https://www.growthspreeofficial.com) or [Adzviser MCP](https://adzviser.com)
+
+    See the [MCP Integration](/reference/mcp-integration) page for setup instructions.
+  </Accordion>
+
+  <Accordion title="Does it use real account data or generic benchmarks?">
+    Both, in combination. The benchmarks built into Claude Ads come from industry research covering 16,000+ campaigns (WordStream/LocaliQ 2025, Triple Whale 2025, SplitMetrics 2025). They represent verified averages — for example, Google Search average CTR of 6.66%, Meta median ROAS of 2.19:1, and TikTok average CPI of approximately $1.00.
+
+    These are averages, not targets. Your results will vary by industry, budget level, geographic market, and account maturity. For the most relevant benchmarks, always provide your industry and monthly spend when running an audit. For example: "I spend $8k/month on Google Ads for a B2B SaaS company selling to mid-market companies."
+
+    If you provide account-specific data (exports or screenshots), Claude Ads analyzes your actual numbers against the appropriate industry benchmarks rather than making assumptions.
+  </Accordion>
+
+  <Accordion title="Is ad posting or campaign creation still manual?">
+    Yes. Claude Ads is an audit and strategy tool. It identifies issues, recommends fixes, builds campaign plans, generates creative briefs, and produces PDF reports — but creating, editing, or posting ads remains manual in your ad platform dashboard.
+
+    The creative pipeline (`/ads dna` → `/ads create` → `/ads generate`) produces campaign briefs and AI-generated image assets that you then upload to your platform. The audit pipeline (`/ads audit`, `/ads google`, etc.) produces prioritized action plans that you implement manually.
+  </Accordion>
+
+  <Accordion title="Why do some recommendations seem off for my account size?">
+    Benchmarks and best practices differ significantly between a $500/month account and a $50,000/month account. Smart Bidding on Google requires at least 15 conversions per month to function — recommending Target CPA to an account spending $300/month is actively harmful advice.
+
+    Always provide budget context upfront. Compare:
+
+    - "Audit my Google Ads" → generic recommendations, may not fit your situation
+    - "I spend $2k/month on Google Ads for a local plumbing business in Phoenix" → recommendations calibrated to your budget, industry, and account maturity
+
+    The more context you provide at the start, the more accurate and actionable the recommendations will be.
+  </Accordion>
+
+  <Accordion title="What platforms are supported?">
+    **Fully supported with dedicated audit checklists and scoring:**
+
+    | Platform | Audit checks |
+    |----------|-------------|
+    | Google Ads | 80 checks (Search, PMax, AI Max, Demand Gen, CTV, YouTube) |
+    | Meta Ads | 50 checks (Pixel/CAPI, Andromeda creative, Structure, Audience) |
+    | LinkedIn Ads | 27 checks (B2B targeting, TLA, Lead Gen, CRM) |
+    | TikTok Ads | 28 checks (Creative, Smart+, GMV Max, Search, Events API) |
+    | Microsoft Ads | 24 checks (Copilot, Google import safety, CTV, LinkedIn targeting) |
+    | Apple Ads | 35+ checks (Campaign structure, CPPs, Maximize Conversions, AdAttributionKit) |
+    | Cross-platform | 3 checks (Privacy infrastructure, creative diversity, refresh cadence) |
+
+    **Covered in the reference guide for strategic planning:** Reddit, CTV/OTT, Pinterest, Snapchat — see `references/additional-platforms.md` after installation.
+  </Accordion>
+
+  <Accordion title="Does it require Python?">
+    Python is optional. The core audit, planning, and strategy features work entirely within Claude Code without any Python installation.
+
+    Python 3.10+ is needed for two specific features:
+    - **Live landing page analysis:** `analyze_landing.py` uses Playwright for browser-based page auditing. Install with `pip install playwright` and run `playwright install`.
+    - **PDF report generation:** `/ads report` uses `generate_report.py`, which requires `reportlab`. Install with `pip install reportlab`.
+
+    If either dependency is missing when you run a command that needs it, Claude Ads displays setup instructions and exits cleanly — it never fails silently.
+  </Accordion>
+
+  <Accordion title="Can I use it without exporting data?">
+    Yes. Claude Ads can work from:
+    - **CSV exports** from your ad platform dashboards (most complete)
+    - **Screenshots** of campaign performance tables
+    - **Manually pasted metrics** ("My Google Ads account has a 4.2% CTR, $3.50 CPC, and I'm spending $5k/month on Search")
+
+    The more complete the data you provide, the more specific the recommendations will be. Screenshots and pasted metrics work well for high-level audits; CSV exports enable check-by-check analysis against the full 212-point checklist.
+  </Accordion>
+
+  <Accordion title="What is the Ads Health Score?">
+    The Ads Health Score is a weighted 0–100 score calculated per platform and as a cross-platform aggregate.
+
+    The formula is:
+
+    ```text
+    S_total = Σ(C_pass × W_sev × W_cat) / Σ(C_total × W_sev × W_cat) × 100
+    ```
+
+    Each check is weighted by its severity (Critical = 5.0, High = 3.0, Medium = 1.5, Low = 0.5) and its category weight (for example, Conversion Tracking is 25–30% of the score on most platforms). A WARNING earns 50% of the points a PASS would earn; a FAIL earns 0.
+
+    **Grading thresholds:**
+
+    | Grade | Score | What it means |
+    |-------|-------|---------------|
+    | A | 90–100 | Minor optimizations only |
+    | B | 75–89 | Some improvement opportunities |
+    | C | 60–74 | Notable issues need attention |
+    | D | 40–59 | Significant problems present |
+    | F | &lt;40 | Urgent intervention required |
+
+    For multi-platform accounts, the aggregate score weights each platform's score by its share of total ad spend.
+
+    See the [Ads Health Score](/reference/scoring) page for the complete formula, category weights, and grading rationale.
+  </Accordion>
+
+  <Accordion title="How do I get the best results?">
+    Provide four pieces of context upfront — before Claude Ads asks for them:
+
+    1. **Industry / business type:** SaaS, e-commerce, local service, B2B enterprise, healthcare, etc.
+    2. **Monthly ad spend:** Total and per-platform if running multiple platforms
+    3. **Primary goal:** Sales/revenue, leads/demos, app installs, calls, or brand awareness
+    4. **Active platforms:** Which platforms you are currently advertising on
+
+    Example of a well-framed request: *"Run a full audit. I spend $15k/month total — $8k on Google Search, $5k on Meta, $2k on LinkedIn. I'm a B2B SaaS company selling project management software to mid-market construction firms. Primary goal is demo requests."*
+
+    This level of context allows Claude Ads to load the correct industry template, apply the right benchmarks, calibrate severity scoring to your budget level, and skip questions that would otherwise slow down the analysis.
+  </Accordion>
+
+  <Accordion title="Does it support multiple clients?">
+    Yes. Use `/ads plan agency` to load the agency template, which includes:
+    - A client onboarding checklist covering discovery, technical setup, and campaign launch phases
+    - A client-to-industry-template mapping table
+    - Standardized campaign naming conventions
+    - A reporting framework (weekly internal, monthly client, quarterly QBR)
+    - A platform selection matrix by client budget tier
+    - The 3x Kill Rule and 20% scaling rule applied across all clients
+
+    For individual client audits, run any audit command in the context of that client's account data. Claude Ads handles each conversation as a separate context, so there is no cross-contamination between client sessions.
+  </Accordion>
+</AccordionGroup>

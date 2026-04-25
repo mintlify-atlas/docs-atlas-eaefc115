@@ -1,0 +1,178 @@
+---
+title: "Full Multi-Platform Audit with /ads audit"
+description: "Audit all active ad platforms simultaneously with 6 parallel subagents. Produces a unified Ads Health Score, prioritized action plan, and quick wins list."
+---
+
+The `/ads audit` command is Claude Ads' flagship workflow. It spawns six specialized subagents in parallel—each focused on a specific domain—and synthesizes their findings into three output files: a comprehensive audit report, a prioritized action plan, and a curated list of quick wins. Instead of reviewing one platform at a time, the full audit captures cross-platform patterns like inconsistent conversion tracking, budget imbalances, and creative misalignment in a single pass.
+
+## How it works
+
+<Steps>
+  <Step title="Context intake">
+    Before any analysis begins, Claude collects four pieces of context: your industry or business type, total monthly ad spend with a per-platform breakdown, primary goal (sales, leads, app installs, calls, or brand), and which platforms are active. If you provide this upfront—for example, "I spend $8k/month on Google and Meta for a SaaS company"—Claude extracts it automatically and skips the questions.
+  </Step>
+  <Step title="Data collection">
+    Claude requests account exports, screenshots, or pasted metrics from each active platform. At minimum it needs one platform's data to proceed. Accepted inputs include Google Ads exports with a Search Terms Report, Meta Ads Manager exports with Events Manager screenshots, LinkedIn Campaign Manager exports, TikTok Ads Manager exports, and Microsoft Ads exports with UET tag status.
+  </Step>
+  <Step title="Business type detection">
+    Claude analyzes account signals to confirm or refine the business type: purchase events and product feeds indicate e-commerce; trial/demo conversion actions indicate SaaS; active LinkedIn campaigns with high CPA tolerance indicate B2B enterprise. Detection drives which industry benchmarks apply and calibrates severity scoring—a $500/month account has different priorities than a $50k/month account.
+  </Step>
+  <Step title="Parallel subagent delegation">
+    Six subagents run simultaneously via the Task tool with `context: fork`. Each receives the relevant account data and its specific checklist. Running in parallel rather than sequentially means the full audit completes in roughly the same time as a single platform analysis.
+  </Step>
+  <Step title="Score validation">
+    Before aggregating results, Claude verifies that each subagent returned valid JSON scores with all required fields. Incomplete or malformed responses are flagged and the affected platform is excluded from the aggregate rather than producing a misleading score.
+  </Step>
+  <Step title="Report generation">
+    Validated scores are aggregated into the Ads Health Score, findings are merged across platforms, and three output files are written to the current working directory.
+  </Step>
+</Steps>
+
+## The 6 parallel subagents
+
+<CardGroup cols={2}>
+  <Card title="audit-google" icon="magnifying-glass">
+    Evaluates 80 checks across Search, Performance Max, AI Max, Demand Gen, CTV, and YouTube. Covers checks G01–G74 from v1.0 plus six v1.5 additions: AI Max for Search (G-AI1), Demand Gen migration from VAC (G-DG1–G-DG3), CTV Floodlight limitation (G-CTV1), and PMax campaign-level negatives (G-PM6).
+  </Card>
+  <Card title="audit-meta" icon="rectangle-ad">
+    Evaluates 50 checks across Pixel/CAPI health, Andromeda creative diversity, account structure, and audience targeting. Covers checks M01–M46 from v1.0 plus four v1.5 additions: Andromeda creative diversity scoring (M-AN1), attribution window changes post-January 2026 (M-AT1), Incremental Attribution (M-IA1), and Threads placement (M-TH1).
+  </Card>
+  <Card title="audit-creative" icon="paintbrush">
+    Evaluates 21+ cross-platform creative quality checks across LinkedIn (L10–L13), TikTok (T05–T10, T20–T25), and Microsoft (MS11–MS13, MS19–MS20). Also assesses Andromeda Creative Similarity Score for Meta accounts and Symphony Automation impact on TikTok creative diversity.
+  </Card>
+  <Card title="audit-tracking" icon="chart-line">
+    Evaluates 8+ conversion tracking checks across LinkedIn (Insight Tag, CAPI), TikTok (Pixel, Events API + ttclid passback), and Microsoft (UET tag, Enhanced Conversions, Google Ads import validation). Also runs cross-platform privacy infrastructure check X-PI1.
+  </Card>
+  <Card title="audit-budget" icon="dollar-sign">
+    Evaluates 24 budget and bidding strategy checks across LinkedIn (L03–L09, L16–L17), TikTok (T03–T04, T11–T16), and Microsoft (MS04–MS10). Applies the 70/20/10 allocation rule, the 20% scaling rule, and the 3x Kill Rule.
+  </Card>
+  <Card title="audit-compliance" icon="shield-check">
+    Evaluates 18+ compliance checks across LinkedIn (L14–L15, L18–L25), TikTok (T17–T19), and Microsoft (MS14–MS18). Flags deprecated features (ECPC, Video Action Campaigns, Creative Sets), EU messaging restrictions, and Special Ad Category requirements.
+  </Card>
+</CardGroup>
+
+## Output files
+
+Running `/ads audit` produces three files in your working directory:
+
+<Tabs>
+  <Tab title="ADS-AUDIT-REPORT.md">
+    The comprehensive findings document. Contains the full audit results organized into four sections.
+
+    **Executive Summary**
+    - Aggregate Ads Health Score (0–100) with grade
+    - Per-platform health scores
+    - Business type detected and active platforms identified
+    - Top 5 critical issues across all platforms
+    - Top 5 quick wins
+
+    **Per-Platform Sections**
+    Each active platform gets its own section with a health score, category breakdown showing pass/warning/fail per check, platform-specific quick wins, and detailed findings with remediation steps.
+
+    **Cross-Platform Analysis**
+    - Budget allocation: actual vs. recommended split
+    - Tracking consistency: are all platforms tracking the same conversion events?
+    - Creative consistency: is messaging aligned across platforms?
+    - Attribution overlap: are platforms double-counting conversions?
+
+    **Strategic Recommendations**
+    - Platform prioritization based on business type
+    - Budget reallocation recommendations
+    - Scaling opportunities (campaigns or platforms ready for more budget)
+    - Kill list (campaigns and ad groups to pause immediately)
+  </Tab>
+  <Tab title="ADS-ACTION-PLAN.md">
+    A prioritized list of every finding that requires action, sorted Critical → High → Medium → Low. Each item includes the affected platform, check ID, finding description, and specific remediation steps with estimated time.
+  </Tab>
+  <Tab title="ADS-QUICK-WINS.md">
+    A focused list of high-impact fixes that take under 15 minutes each. Quick Wins are sorted by a combined severity × estimated impact score so the highest-value items appear first.
+
+    ```
+    IF severity == "Critical" OR severity == "High"
+    AND estimated_fix_time < 15 minutes
+    THEN flag as Quick Win
+    SORT BY (severity_multiplier × estimated_impact) DESC
+    ```
+  </Tab>
+</Tabs>
+
+## Scoring and grading
+
+### Per-platform scoring
+
+Each platform uses a weighted scoring algorithm based on category weights specific to that platform:
+
+| Platform | Highest-weighted category |
+|----------|--------------------------|
+| Google Ads | Conversion Tracking (25%) |
+| Meta Ads | Pixel/CAPI Health (30%), Creative (30%) tied |
+| LinkedIn Ads | Technical Setup (25%), Audience Quality (25%) tied |
+| TikTok Ads | Creative Quality (30%) |
+| Microsoft Ads | Technical Setup (25%) |
+
+Each check within a category earns full points (PASS), 50% (WARNING), or 0 (FAIL), multiplied by a severity weight: Critical 5.0×, High 3.0×, Medium 1.5×, Low 0.5×.
+
+### Aggregate score
+
+The overall Ads Health Score weights each platform's score by its share of total ad spend:
+
+```
+Aggregate = Sum(Platform_Score × Platform_Budget_Share)
+
+Example: Google (82) × 40% + Meta (71) × 35% + LinkedIn (90) × 25%
+       = 32.8 + 24.85 + 22.5 = 80.15 → Grade B
+```
+
+### Grading table
+
+| Grade | Score | Label | Action required |
+|-------|-------|-------|-----------------|
+| A | 90–100 | Excellent | Minor optimizations only |
+| B | 75–89 | Good | Some improvement opportunities |
+| C | 60–74 | Needs improvement | Notable issues need attention |
+| D | 40–59 | Poor | Significant problems present |
+| F | &lt;40 | Critical | Urgent intervention required |
+
+<Note>
+Ad account health scores are typically distributed lower than academic-style scoring. A score of 75+ represents a genuinely well-managed account. The wider grade bands reflect this reality.
+</Note>
+
+## Priority levels
+
+Every finding in the audit report and action plan is assigned one of four priority levels:
+
+| Priority | Meaning | Timeline |
+|----------|---------|----------|
+| **Critical** | Revenue or data loss risk | Fix immediately |
+| **High** | Significant performance drag | Fix within 7 days |
+| **Medium** | Optimization opportunity | Fix within 30 days |
+| **Low** | Best practice, minor impact | Backlog |
+
+## Quality gates enforced
+
+The audit enforces hard rules that are never overridden:
+
+- Never recommend Broad Match without Smart Bidding (Google)
+- 3× Kill Rule: flag any campaign or ad group with CPA >3× target for immediate pause
+- Budget sufficiency: Meta ≥5× CPA per ad set, TikTok ≥50× CPA per ad group
+- Learning phase protection: no edits during active learning phases
+- Privacy infrastructure gate: verify Consent Mode V2 (Google/Microsoft), CAPI (Meta), Events API (TikTok), and AdAttributionKit (Apple) before making optimization recommendations
+- Andromeda creative diversity: flag Meta accounts with fewer than 10 genuinely distinct creatives
+- Compliance: auto-check Special Ad Categories for housing, employment, credit, and financial products
+
+## Related commands
+
+<CardGroup cols={2}>
+  <Card title="/ads google" href="/commands/google" icon="magnifying-glass">
+    Deep 80-check Google Ads analysis run standalone
+  </Card>
+  <Card title="/ads meta" href="/commands/meta" icon="rectangle-ad">
+    Deep 50-check Meta Ads analysis run standalone
+  </Card>
+  <Card title="/ads budget" href="/commands/budget" icon="dollar-sign">
+    Budget allocation and bidding strategy review
+  </Card>
+  <Card title="PDF Reports" href="/reference/quality-gates" icon="file-pdf">
+    Quality gates enforced during every audit and report generation
+  </Card>
+</CardGroup>

@@ -1,0 +1,198 @@
+---
+title: "YouTube Ads Analysis with /ads youtube"
+description: "Analyze YouTube campaign quality across Skippable, Bumper, Shorts, Demand Gen, and CTV formats — hook strength, targeting, measurement, and specs."
+---
+
+The `/ads youtube` command analyzes YouTube advertising campaigns within your Google Ads account. It evaluates all five YouTube-specific campaign types—Skippable In-Stream, Non-Skippable In-Stream, Bumper Ads, YouTube Shorts, and Demand Gen—plus Connected TV inventory, which now accounts for roughly 75% of YouTube ad spend. The audit assesses creative quality, campaign setup, audience targeting, and measurement, and produces a `YOUTUBE-ADS-REPORT.md` with a health score and prioritized recommendations.
+
+## Data needed
+
+To run a complete analysis, provide:
+
+- Google Ads account export filtered to Video campaign types (last 30 days recommended)
+- Video performance metrics: view rate, completion rate, CPV, CTR, average watch time
+- Any active Brand Lift study results if available
+- Whether Demand Gen campaigns are running (and if any Video Action Campaigns remain)
+- Connected TV campaign spend and measurement approach (specifically whether Floodlight is in use)
+
+<Note>
+  The audit flags any remaining Video Action Campaigns (VAC) as deprecated. All VACs were auto-upgraded to Demand Gen campaigns by April 2026.
+</Note>
+
+## Campaign types assessed
+
+### Skippable In-Stream (TrueView)
+
+Minimum 12 seconds, recommended 15–30 seconds. Users can skip after 5 seconds, making the first 5 seconds the most critical creative real estate on the platform.
+
+Key checks:
+- Hook quality in the first 5 seconds (attention-grabbing, brand visible, value clear)
+- CTA card placement and timing
+- View rate benchmark: ≥15% is good; skip rate of 65–80% is normal for the format
+- Ad strength signals: does the first frame communicate the offer without audio?
+
+### Non-Skippable In-Stream
+
+Up to 60 seconds (expanded in 2025; previously 15–20 seconds). Bidding via Target CPM; best for brand awareness and reach.
+
+Key checks:
+- Frequency capping applied to avoid overexposure
+- Message completeness within the full runtime
+- Creative length optimization (are 60-second slots being used where 30 seconds would suffice?)
+- Brand presence throughout (not just at the end)
+
+### Bumper Ads
+
+Exactly 6 seconds, non-skippable. A single focused message. No time for a story arc—brand, benefit, and visual must be immediately clear.
+
+Key checks:
+- Single-message focus (not a compressed version of a longer ad)
+- Brand element visible throughout the 6 seconds
+- Used as reach extension alongside longer formats (not as a standalone campaign)
+
+### YouTube Shorts Ads
+
+9:16 vertical format (1080×1920 recommended), up to 60 seconds. Sound-on is required—music or voiceover increases conversions by over 20%.
+
+Key checks:
+- Vertical format compliance (9:16 only—no letterboxed horizontal)
+- Sound-on creative design (never produce silent Shorts ads)
+- CTA button timing: appears at 3 seconds for PMax/App/Demand Gen campaigns, at 10 seconds for Video View/Reach campaigns
+- Native, organic feel (creator-style content outperforms polished production)
+- Placement exclusions for Shorts only work at the account level, not the campaign or ad group level
+
+High-performing Shorts ad structure:
+
+```
+0–2s: Problem identification — relatable pain point or attention-grabbing question
+2–5s: Product reveal — solution shown in context
+Final 2s: CTA with urgency — clear next step with time or quantity pressure
+```
+
+### Demand Gen
+
+Replaced Video Action Campaigns (fully deprecated April 2026). Reaches users across YouTube Home Feed, Watch Next, Discover, Gmail, and the Google Display Network.
+
+Key checks:
+- Both video AND image assets uploaded (20% more conversions at same CPA vs video-only)
+- Former VAC frequency cap strategy replaced—Demand Gen does not support frequency capping; flag accounts that relied on VAC frequency caps without a replacement monitoring strategy
+- Audience signals configured (custom segments, lookalikes)
+- Conversion tracking aligned with upper/mid-funnel goals
+
+<Warning>
+  Demand Gen does not support frequency capping. If your VAC campaigns used frequency caps, you need an alternative strategy—either Video Frequency Groups (currently in alpha) or manual frequency monitoring via reach reports.
+</Warning>
+
+### Connected TV (CTV)
+
+YouTube's fastest-growing surface, with ~150 million Americans watching YouTube on TV screens. 30-second non-skippable ads are available exclusively on CTV. Shoppable CTV (using Merchant Center feeds with QR codes) launched in 2026.
+
+Key checks:
+- CTV-specific creative: larger text, simpler visuals optimized for TV viewing distance
+- **Critical**: Floodlight conversion measurement does NOT work on CTV devices. CTV campaigns must use Google Ads conversion tracking or GA4 instead.
+- Measurement strategy confirmed (non-Floodlight tracking in place)
+- Co-viewing metrics enabled for comparison with linear TV benchmarks
+
+## Creative quality assessment
+
+### Hook analysis (first 5 seconds)
+
+The audit evaluates each skippable video against the ABCD framework:
+
+- **A — Attention**: Does the video capture attention immediately? No slow intros, title cards, or logo-only openings.
+- **B — Branding**: Brand element visible within the first 5 seconds (recommended for awareness campaigns). Problem/benefit statement upfront for action campaigns.
+- **C — Connection**: Does the ad humanize the brand or product? Does it address a real user need?
+- **D — Direction**: Is there a clear, explicit CTA?
+
+Ads following the ABCD framework deliver a 30% lift in short-term sales likelihood and 17% lift in long-term brand contribution (Google/Kantar research).
+
+### Production quality
+
+| Element | Check |
+|---------|-------|
+| Audio | Clear, professional, background music appropriate |
+| Visual | HD minimum (1080p), proper lighting |
+| Subtitles/captions | Present (roughly 30% of YouTube video is watched muted) |
+| End screen | CTA, subscribe button, related video cards |
+
+### Creative volume
+
+- ≥3 video variations per campaign (different hooks, lengths, messages)
+- Mix of lengths: 6s bumper + 15–60s non-skippable + 30s skippable
+- Both vertical (9:16) and horizontal (16:9) versions available
+- Refresh cadence: every 4–8 weeks for top-performing campaigns
+
+## Audience targeting
+
+The audit checks coverage across YouTube-specific targeting options:
+
+| Targeting type | Purpose |
+|----------------|---------|
+| Custom Intent | Users searching for specific terms on YouTube or Google |
+| In-Market Audiences | Users actively researching purchase categories |
+| Affinity Audiences | Broad interest-based reach for awareness |
+| Customer Match | First-party list retargeting |
+| Placement Targeting | Specific channels, videos, or topics |
+
+Separate prospecting and retargeting campaigns are required. Converted users should be excluded from prospecting campaigns.
+
+## Measurement
+
+### Frequency management
+
+- Awareness campaigns: 3–5 exposures per week (Target Frequency campaigns support up to 4/week; 95%+ of campaigns achieved their frequency goals)
+- Direct response: 1–2 exposures per week
+- Triscuit case study: Target frequency 2/week = 93% higher absolute ad recall lift at 40% cheaper cost per lifted user
+- Demand Gen does NOT support frequency capping
+
+### Key benchmarks
+
+| Metric | Benchmark | Notes |
+|--------|-----------|-------|
+| View rate (skippable) | ≥15% | Higher = better hook quality |
+| CPV (skippable) | $0.01–$0.10 | Varies by targeting precision |
+| VTR (bumper) | 90%+ | Non-skippable; should be near 100% |
+| CPM (non-skippable) | $6–$15 | Varies by market |
+| CTR (Demand Gen) | ≥0.5% | Image + video combined |
+
+### Attribution considerations
+
+YouTube is an upper- and mid-funnel channel. Last-click attribution significantly understates YouTube's contribution. The audit recommends:
+
+- Data-driven attribution in Google Ads (not last-click)
+- View-through conversion tracking enabled (important for video)
+- Brand Lift Studies for awareness campaigns (requires minimum spend thresholds)
+- Cross-channel impact analysis: YouTube often assists Search and Shopping conversions
+
+## YouTube Ads health score
+
+The YouTube health score uses four weighted categories:
+
+| Category | Weight |
+|----------|--------|
+| Creative Quality | 30% |
+| Campaign Setup | 25% |
+| Audience Targeting | 25% |
+| Measurement | 20% |
+
+Grades follow the standard scale: A (90–100), B (75–89), C (60–74), D (40–59), F (&lt;40).
+
+## Quick wins
+
+| Check | Fix | Time |
+|-------|-----|------|
+| Demand Gen migration | Upgrade remaining VACs to Demand Gen with video + image assets | 15 min |
+| Shorts vertical format | Create 9:16 vertical cuts of existing horizontal ads | 10 min |
+| Add image assets to Demand Gen | Upload image assets alongside video (20% more conversions) | 10 min |
+| Target Frequency | Set Target Frequency to 4/week for awareness campaigns | 5 min |
+| CTV measurement | Switch CTV campaigns from Floodlight to Google Ads conversion tracking | 10 min |
+
+## Output
+
+Running `/ads youtube` produces:
+
+- **`YOUTUBE-ADS-REPORT.md`**: Campaign-by-campaign analysis with health score
+- **Creative quality scorecard**: Hook strength, production quality, and format compliance per video
+- **Audience strategy recommendations**: Targeting gaps and overlap assessment
+- **Measurement gap analysis**: Attribution model, view-through tracking, Brand Lift study recommendations
+- **Quick Wins**: Sorted by impact

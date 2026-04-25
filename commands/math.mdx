@@ -1,0 +1,221 @@
+---
+title: "PPC Financial Calculator: /ads math"
+description: "Calculate CPA, ROAS, break-even ROAS, LTV:CAC ratio, budget forecasts, and impression share opportunity in conversation — no spreadsheet needed."
+---
+
+`/ads math` is a conversational PPC calculator. Ask Claude to run a specific calculation, provide your numbers, and it returns results with the formula shown, a benchmark comparison, and a plain-language recommendation. It works with pasted data from platform exports or numbers you type directly. No API access or spreadsheet required.
+
+## Command
+
+```bash
+/ads math
+```
+
+There is no structured form to fill out. Describe what you want to calculate in plain language and Claude handles the rest.
+
+**Example prompts:**
+
+```
+/ads math
+
+What ROAS do I need to break even with 40% gross margins?
+How much should I spend to get 50 leads at a $100 CPA?
+We spent $12,000 and generated $41,000 in revenue — what's our ROAS?
+Our LTV is $1,200 and we acquired 80 customers for $18,000 total spend — is that healthy?
+```
+
+<Note>
+  `/ads math` is a quick conversational utility. Claude does not generate a full written report for math calculations and does not append the community footer after this command.
+</Note>
+
+## Calculators
+
+### CPA — Cost Per Acquisition
+
+```
+CPA = Total Spend / Total Conversions
+```
+
+**Inputs needed:**
+- Total ad spend for the period
+- Total conversions for the same period
+
+**Output:** CPA with period context, trend analysis if historical data is provided, comparison to industry benchmarks.
+
+---
+
+### ROAS — Return on Ad Spend
+
+```
+ROAS = Revenue from Ads / Ad Spend
+ROAS% = (Revenue − Spend) / Spend × 100
+```
+
+**Inputs needed:**
+- Total ad spend
+- Total revenue attributed to ads
+
+**Output:** ROAS as a ratio (e.g., 3.5×) and as a percentage (250%), break-even ROAS based on your margins, comparison to platform benchmarks.
+
+---
+
+### Break-even analysis
+
+```
+Break-Even CPA  = Average Order Value × Profit Margin
+Break-Even ROAS = 1 / Profit Margin
+```
+
+**Inputs needed:**
+- Average order value (AOV) or average deal value
+- Gross margin percentage
+- Current CPA or ROAS
+
+**Output:** Maximum profitable CPA, minimum profitable ROAS, how much headroom exists between current performance and break-even, and whether to scale, maintain, or cut.
+
+**Example:** With a 40% gross margin, your break-even ROAS is `1 / 0.40 = 2.5×`. Any campaign delivering below 2.5× ROAS is losing money on every conversion.
+
+---
+
+### Impression share opportunity
+
+```
+Revenue Opportunity = Current Revenue × (1 / Current IS − 1)
+```
+
+**Inputs needed:**
+- Current impression share percentage
+- Impression share lost to budget (%)
+- Impression share lost to rank (%)
+- Current spend and conversions
+
+**Output:** Estimated additional conversions from capturing full impression share, budget required for full IS (estimated), and whether the priority is a budget increase or quality score improvement.
+
+---
+
+### Budget forecasting
+
+```
+Projected Spend       = Daily Budget × Days in Period
+Projected Conversions = Projected Spend / Historical CPA
+Projected Revenue     = Projected Conversions × AOV
+```
+
+Claude generates three scaling scenarios:
+
+| Scenario | Budget change | Notes |
+|----------|--------------|-------|
+| Conservative | +20% | Safe scaling within the 20% rule |
+| Moderate | +50% | Growth with diminishing returns warning |
+| Aggressive | +100% | High growth, significant efficiency risk |
+
+**Inputs needed:** Current daily budget, historical CPA (last 30 days), forecast period, and AOV if revenue projection is needed.
+
+---
+
+### LTV:CAC ratio
+
+```
+CAC           = Total Marketing Spend / New Customers Acquired
+LTV           = Average Revenue per Customer × Average Customer Lifespan
+LTV:CAC Ratio = LTV / CAC
+```
+
+**Inputs needed:**
+- Total marketing spend across all channels
+- New customers acquired in the same period
+- Average revenue per customer (monthly or annual)
+- Average customer lifespan in months
+- Gross margin (optional, for unit economics)
+
+**Interpreting the ratio:**
+
+| LTV:CAC | Interpretation |
+|---------|---------------|
+| < 1:1 | Losing money on every customer acquired |
+| 1:1 – 2:1 | Break-even to marginal; unsustainable long-term |
+| 3:1 | Healthy — the SaaS industry benchmark |
+| 5:1+ | May be under-investing in growth; consider increasing spend |
+
+Claude also calculates your payback period: the number of months to recover the cost of acquiring a customer.
+
+---
+
+### MER — Marketing Efficiency Ratio
+
+```
+MER = Total Revenue / Total Marketing Spend
+```
+
+**Inputs needed:**
+- Total business revenue for the period
+- Total marketing spend across all channels for the same period
+
+**Output:** MER ratio with interpretation versus your business type benchmark.
+
+| Business type | Healthy MER | Excellent MER |
+|--------------|-------------|---------------|
+| E-commerce | 3.0–5.0× | > 5.0× |
+| SaaS | 5–10× | > 10× |
+| Local service | 3–8× | > 8× |
+
+<Tip>
+  MER captures blended efficiency including organic, brand, and retention revenue — not just paid-attributed revenue. It's a more accurate measure of true marketing ROI than platform-reported ROAS, which overclaims by 20–40% due to attribution overlap between channels.
+</Tip>
+
+## Quick formula reference
+
+| Metric | Formula |
+|--------|---------|
+| CPA | Spend ÷ Conversions |
+| ROAS | Revenue ÷ Spend |
+| CTR | Clicks ÷ Impressions × 100 |
+| CVR | Conversions ÷ Clicks × 100 |
+| CPC | Spend ÷ Clicks |
+| CPM | (Spend ÷ Impressions) × 1,000 |
+| CPL | Spend ÷ Leads |
+| Break-even CPA | AOV × Margin% |
+| Break-even ROAS | 1 ÷ Margin% |
+| LTV | ARPU × Average Customer Lifespan |
+| CAC | Total Marketing Spend ÷ New Customers |
+| MER | Total Revenue ÷ Total Marketing Spend |
+| Impression Share Opportunity | Revenue × (1 ÷ IS − 1) |
+
+## Output format
+
+Every calculation Claude returns follows this structure:
+
+```
+### [Calculator name]
+
+Inputs:
+- [Listed inputs with your values]
+
+Results:
+| Metric     | Value       | Benchmark   | Status  |
+|------------|-------------|-------------|---------|
+| [Metric]   | [Value]     | [Benchmark] | PASS / WARNING / FAIL |
+
+Interpretation:
+[One or two sentence plain-language analysis]
+
+Recommendation:
+[Actionable next step]
+```
+
+## Advanced measurement
+
+For large accounts that need to measure cross-channel contribution beyond standard PPC math:
+
+<AccordionGroup>
+  <Accordion title="Meta Incremental Attribution (April 2025)">
+    AI-powered holdout testing that measures the real causal impact of Meta ads — what would not have happened without the spend. Relevant for accounts spending $5,000+/month on Meta. This complements CPA and ROAS calculations by measuring true incrementality rather than attributed conversions.
+  </Accordion>
+  <Accordion title="Google Meridian (2025)">
+    Open-source Marketing Mix Model from Google for incrementality measurement across all channels. Uses Bayesian statistics at the geographic level. Best for accounts where cross-channel attribution is a persistent measurement challenge.
+  </Accordion>
+</AccordionGroup>
+
+<Note>
+  For detecting small effects (5% minimum detectable effect), multiply the standard 10% MDE sample size by approximately 4×. Claude will flag this when your stated MDE is below 10% during budget forecasting or impression share opportunity calculations.
+</Note>

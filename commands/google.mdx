@@ -1,0 +1,216 @@
+---
+title: "Google Ads Deep Analysis with /ads google"
+description: "Audit all 80 Google Ads checks across Search, PMax, AI Max, Demand Gen, CTV, and YouTube with weighted scoring and a prioritized action plan."
+---
+
+The `/ads google` command runs a standalone Google Ads audit using the same 80-check framework as the `audit-google` subagent within `/ads audit`. It covers every major campaign type Google offers—Search, Performance Max, AI Max for Search, Demand Gen, Connected TV, and YouTube—and produces a `GOOGLE-ADS-REPORT.md` with a weighted health score, per-category breakdown, quick wins, and an estimated monthly wasted spend figure.
+
+## Scope
+
+`/ads google` analyzes all six campaign surfaces:
+
+- **Search** — keyword targeting, RSA quality, Quality Score, wasted spend
+- **Performance Max** — asset group density, audience signals, brand cannibalization, negative keywords
+- **AI Max for Search** — keywordless targeting evaluation, negative keyword coverage, DSA consolidation path
+- **Demand Gen** — VAC migration status, video + image asset mix, frequency monitoring
+- **Connected TV** — Floodlight limitation check, CTV-appropriate measurement
+- **YouTube** — video asset formats, Shorts vertical compliance
+
+## Category breakdown and weights
+
+The 80 checks are organized into six weighted categories. Critical checks (5.0× severity multiplier) within a category have the largest impact on score, so the audit evaluates them first.
+
+<Tabs>
+  <Tab title="Conversion Tracking — 25%">
+    **12 checks: G42–G49, G-CT1–G-CT3, G-CTV1**
+
+    This is the highest-weighted category because broken tracking invalidates every optimization decision downstream.
+
+    | Check | Description | Severity |
+    |-------|-------------|----------|
+    | G42 | Conversion actions defined | Critical |
+    | G43 | Enhanced Conversions active (~10% uplift, free setup) | Critical |
+    | G44 | Server-side tracking (GTM server-side or API import) | High |
+    | G45 | Consent Mode V2 implemented (Advanced mode; enforcement began July 21, 2025 for EEA/UK) | Critical |
+    | G46 | Conversion window matches sales cycle (7d ecom, 30–90d B2B) | Medium |
+    | G47 | Only macro conversions (Purchase, Lead) set as Primary for bidding | High |
+    | G48 | Data-driven attribution selected (rule-based models auto-upgraded to DDA) | Medium |
+    | G49 | Conversion value assignment (dynamic for ecom, value rules for lead gen) | High |
+    | G-CT1 | No duplicate counting (GA4 import + native tag not double-counting) | Critical |
+    | G-CT2 | GA4 property linked and data flowing correctly | High |
+    | G-CT3 | Google Tag (gtag.js or GTM) firing on all pages | Critical |
+    | G-CTV1 | CTV campaigns not using Floodlight (Floodlight does not fire on CTV devices) | High |
+
+    <Warning>
+      Consent Mode V2 requires 700+ ad clicks per day over 7 days per country/domain for behavioral modeling to activate. Accounts below this threshold will see limited conversion recovery even with correct implementation.
+    </Warning>
+  </Tab>
+  <Tab title="Wasted Spend / Negatives — 20%">
+    **8 checks: G13–G19, G-WS1**
+
+    Direct budget leak. These checks identify money leaving the account without generating conversions.
+
+    | Check | Description | Severity |
+    |-------|-------------|----------|
+    | G13 | Search term audit within last 14 days | Critical |
+    | G14 | ≥3 themed negative keyword lists (Competitor, Jobs, Free, Irrelevant) | Critical |
+    | G15 | Negative lists applied at account or all-campaign level | High |
+    | G16 | Wasted spend on irrelevant terms &lt;5% (last 30 days) | Critical |
+    | G17 | No Broad Match + Manual CPC combinations | Critical |
+    | G18 | Close variant pollution not affecting performance | High |
+    | G19 | >60% of search term spend visible (not hidden) | Medium |
+    | G-WS1 | No keywords with >100 clicks and 0 conversions | High |
+
+    <Note>
+      G16 only flags terms with >$10 spend AND 0 conversions. Long-tail terms with minimal spend are normal exploration, not waste.
+    </Note>
+  </Tab>
+  <Tab title="Account Structure — 15%">
+    **12 checks: G01–G12**
+
+    Campaign and ad group organization affects how the algorithm allocates budget and how effectively negative keywords can be applied.
+
+    | Check | Description | Severity |
+    |-------|-------------|----------|
+    | G01 | Consistent campaign naming convention | Medium |
+    | G02 | Consistent ad group naming convention | Medium |
+    | G03 | Single-theme ad groups (≤10 keywords per group) | High |
+    | G04 | ≤5 campaigns per funnel stage/objective | High |
+    | G05 | Brand and non-brand in separate campaigns | Critical |
+    | G06 | Performance Max active for eligible accounts | Medium |
+    | G07 | Brand exclusions in PMax when brand Search campaign exists | High |
+    | G08 | Budget allocation matches campaign priority | High |
+    | G09 | No campaigns hitting daily budget cap before 6PM | Medium |
+    | G10 | Ad schedule configured for businesses with operating hours | Low |
+    | G11 | Geographic targeting set to "People in" not "People in or interested in" | High |
+    | G12 | Display Network disabled for Search campaigns | High |
+  </Tab>
+  <Tab title="Keywords & Quality Score — 15%">
+    **8 checks: G20–G25, G-KW1, G-KW2**
+
+    Quality Score is treated as a diagnostic, not a KPI. Low QS signals structural problems—ad relevance mismatches, poor landing page alignment—that hurt both performance and CPCs.
+
+    | Check | Threshold |
+    |-------|-----------|
+    | Average QS (impression-weighted) | ≥7 = Pass, 5–6 = Warning, ≤4 = Fail |
+    | Keywords with QS ≤3 | &lt;10% = Pass, 10–25% = Warning, >25% = Fail |
+    | "Below Average" expected CTR | &lt;20% = Pass, 20–35% = Warning, >35% = Fail |
+    | "Below Average" ad relevance | &lt;20% = Pass, 20–35% = Warning, >35% = Fail |
+    | "Below Average" landing page experience | &lt;15% = Pass, 15–30% = Warning, >30% = Fail |
+    | Zero-impression keywords (last 30 days) | &lt;10% = Pass, >10% = Warning |
+  </Tab>
+  <Tab title="Ads & Assets — 15%">
+    **12 RSA/general checks + 6 PMax checks + 4 AI/Demand Gen checks = 22 checks total**
+
+    This category covers RSA quality, asset completeness for Performance Max, AI Max adoption, and Demand Gen multi-format requirements.
+
+    **RSA checks (G26–G35, G-AD1, G-AD2):**
+    - ≥1 RSA per ad group (≥2 recommended)
+    - ≥8 unique headlines, ≥3 descriptions per RSA
+    - All RSAs rated "Good" or "Excellent" Ad Strength (not "Poor")
+    - New ad copy tested within last 90 days
+
+    **PMax checks (G-PM1–G-PM6):**
+    - Audience signals configured per asset group
+    - Asset group density: ≥20 images, ≥5 logos, ≥5 native videos
+    - Brand cannibalization &lt;15% of PMax conversions from brand terms
+    - Campaign-level negative keywords configured (now available for all advertisers)
+
+    **AI Max & Demand Gen checks (G-AI1, G-DG1–G-DG3):**
+    - AI Max for Search evaluated for accounts with >50 conversions/month
+    - Demand Gen campaigns include both video AND image assets (20% more conversions vs video-only)
+    - All Video Action Campaigns migrated to Demand Gen (auto-upgraded April 2026)
+    - Former VAC frequency cap strategy replaced (Demand Gen does not support frequency capping)
+  </Tab>
+  <Tab title="Settings & Targeting — 10%">
+    **12 checks: G36–G41, G50–G61**
+
+    Includes bidding strategy health, budget constraints, extensions, audience signals, and landing page performance.
+
+    **Bidding (G36–G41):**
+    - Smart Bidding active for all campaigns with ≥15 conversions/30 days
+    - ECPC flagged as deprecated (March 2025); migrate to tCPA/tROAS/Maximize Conversions
+    - Target CPA/ROAS within 20% of historical performance (Critical if off by >50%)
+    - &lt;25% of campaigns in Learning or Learning Limited status
+
+    **Extensions (G50–G55):**
+    - ≥4 sitelinks, ≥4 callouts, ≥1 structured snippet per campaign
+    - Image extensions active for Search campaigns
+
+    **Audiences & Landing Pages (G56–G61):**
+    - Remarketing + in-market audiences applied in Observation mode
+    - Customer Match lists uploaded and refreshed within 30 days
+    - Mobile LCP &lt;2.5s (fail threshold: >4.0s)
+  </Tab>
+</Tabs>
+
+## Quality rules enforced
+
+Two hard rules apply specifically to Google Ads and are never overridden:
+
+<CardGroup cols={2}>
+  <Card title="No Broad Match without Smart Bidding" icon="ban">
+    Broad Match without algorithmic bid control wastes budget. The audit flags any Broad Match keyword running on Manual CPC as a Critical failure. Note: legacy Broad Match Modified keywords (BROAD + Manual CPC) are identified separately and not incorrectly flagged as intentional broad match.
+  </Card>
+  <Card title="3× Kill Rule" icon="skull">
+    Any campaign or ad group with CPA >3× the target CPA is flagged for immediate pause review. These are included in the Kill List section of `ADS-ACTION-PLAN.md`.
+  </Card>
+</CardGroup>
+
+## Key thresholds
+
+| Metric | Pass | Warning | Fail |
+|--------|------|---------|------|
+| Quality Score (avg impression-weighted) | ≥7 | 5–6 | ≤4 |
+| Wasted spend | &lt;5% | 5–15% | >15% |
+| RSA Ad Strength | Good/Excellent | Average | Poor |
+| Search term visibility | >60% | 40–60% | &lt;40% |
+| Learning Limited campaigns | &lt;25% | 25–40% | >40% |
+| Landing page LCP | &lt;2.5s | 2.5–4.0s | >4.0s |
+
+## Performance Max deep dive
+
+If PMax campaigns are present, the audit additionally evaluates:
+
+<AccordionGroup>
+  <Accordion title="Audience signals">
+    Custom audience signals configured per asset group (High severity). Generic demographic signals only = Warning. No signals at all = Fail.
+  </Accordion>
+  <Accordion title="Asset group density">
+    Pass threshold: ≥20 images, ≥5 logos, ≥5 native videos per asset group. Auto-generated video from images is a Warning—native video is required for full format coverage. PMax needs 30–50+ conversions/month minimum to optimize effectively.
+  </Accordion>
+  <Accordion title="Brand cannibalization">
+    &lt;15% of PMax conversions coming from brand terms = Pass. Brand exclusions (now available for all PMax advertisers) should be configured wherever a brand Search campaign exists.
+  </Accordion>
+  <Accordion title="Campaign-level negative keywords">
+    Negative keywords are now available at the campaign level for all PMax advertisers. One reported case showed a 15% immediate cost reduction after adding campaign-level negatives. This is a Quick Win if not yet configured.
+  </Accordion>
+  <Accordion title="Search themes">
+    Up to 50 search themes per asset group can guide PMax toward relevant inventory. No search themes = Fail.
+  </Accordion>
+</AccordionGroup>
+
+## Quick wins
+
+Common Quick Wins flagged by the audit (Critical or High severity, &lt;15 minute fix):
+
+| Check | Fix | Time |
+|-------|-----|------|
+| G43: Enhanced Conversions | Enable in Google Ads conversion settings | 5 min |
+| G11: Location targeting | Switch to "People in" your targeted locations | 2 min |
+| G14: Negative keyword lists | Create initial themed negative lists | 10 min |
+| G17: Broad Match + Manual CPC | Switch to Smart Bidding or Exact Match | 5 min |
+| G12: Network settings | Disable Display Network on Search campaigns | 2 min |
+| G05: Brand separation | Split brand keywords into separate campaign | 10 min |
+| G50: Sitelink extensions | Add 4+ sitelinks to campaigns | 10 min |
+| G-PM6: PMax negative keywords | Add campaign-level negatives to PMax | 10 min |
+
+## Output
+
+Running `/ads google` produces:
+
+- **`GOOGLE-ADS-REPORT.md`**: Full 80-check results with per-category scores, pass/warning/fail table for each check, and findings with remediation steps
+- **Wasted spend estimate**: Monthly dollar value of spend on irrelevant search terms
+- **Quick Wins list**: Sorted by severity × estimated impact
+- **PMax-specific recommendations**: Asset group gaps, audience signal recommendations, brand protection actions
+- **Keyword health matrix**: Quality Score, CTR, and CVR per keyword group

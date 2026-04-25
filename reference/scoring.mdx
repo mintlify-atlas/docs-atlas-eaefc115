@@ -1,0 +1,184 @@
+---
+title: "Ads Health Score: How Scoring Works"
+description: "Understand the weighted formula, severity multipliers, category weights, and grading thresholds that produce every Ads Health Score."
+---
+
+Every audit Claude Ads runs ends with a single number: the Ads Health Score. That number is not an average of pass/fail checks — it is a weighted sum that gives more weight to the checks that affect your revenue most directly. This page explains the exact formula, the per-platform category weights that drive it, and how individual check results translate into a final grade.
+
+## The weighted scoring formula
+
+```text
+S_total = Σ(C_pass × W_sev × W_cat) / Σ(C_total × W_sev × W_cat) × 100
+```
+
+| Variable | Meaning |
+|----------|---------|
+| `C_pass` | 1 if the check passed, 0.5 if WARNING, 0 if FAIL |
+| `W_sev` | Severity multiplier of the individual check |
+| `W_cat` | Category weight for that platform |
+
+The result is a 0–100 score. Because each check is weighted by both its severity and the importance of its category, a single critical failure in conversion tracking can drop your score far more than ten low-severity warnings combined.
+
+## Severity multipliers
+
+| Severity | Multiplier | Criteria |
+|----------|-----------|----------|
+| Critical | 5.0 | Immediate revenue or data loss risk. Remediation urgent. |
+| High | 3.0 | Significant performance drag. Fix within 7 days. |
+| Medium | 1.5 | Optimization opportunity. Fix within 30 days. |
+| Low | 0.5 | Best practice, minor impact. Nice to have. |
+
+## Check result values
+
+| Result | Points earned |
+|--------|--------------|
+| PASS | Full `W_sev × W_cat` |
+| WARNING | 50% of full points |
+| FAIL | 0 points |
+| N/A | Excluded from denominator entirely |
+
+## Category weights by platform
+
+Weights are calibrated around the principle that broken tracking invalidates every optimization decision downstream. Creative and structure follow in priority; settings and compliance, while important, have lower direct revenue impact.
+
+<Tabs>
+  <Tab title="Google Ads">
+    | Category | Weight | Check count |
+    |----------|--------|-------------|
+    | Conversion Tracking | 25% | 12 checks |
+    | Wasted Spend / Negatives | 20% | 8 checks |
+    | Account Structure | 15% | 12 checks |
+    | Keywords & Quality Score | 15% | 8 checks |
+    | Ads & Assets | 15% | 22 checks (RSA, PMax, AI Max, Demand Gen) |
+    | Settings & Targeting | 10% | 12 checks |
+
+    **Total: 80 checks (v1.5)**
+  </Tab>
+  <Tab title="Meta Ads">
+    | Category | Weight | Check count |
+    |----------|--------|-------------|
+    | Pixel / CAPI Health | 30% | 10 checks |
+    | Creative (Diversity & Fatigue) | 30% | 12 checks |
+    | Account Structure | 20% | 18 checks |
+    | Audience & Targeting | 20% | 6 checks |
+
+    Andromeda & Platform Changes checks (4 checks) are scored within the categories above.
+
+    **Total: 50 checks (v1.5)**
+  </Tab>
+  <Tab title="LinkedIn Ads">
+    | Category | Weight | Check count |
+    |----------|--------|-------------|
+    | Technical Setup | 25% | 2 checks |
+    | Audience Quality | 25% | 7 checks |
+    | Creative & Formats | 20% | 4 checks |
+    | Lead Gen Forms | 15% | 2 checks |
+    | Bidding & Budget | 15% | 2 checks |
+    | CRM & Compliance | 10% | 2 checks |
+
+    **Total: 27 checks (v1.5)**
+  </Tab>
+  <Tab title="TikTok Ads">
+    | Category | Weight | Check count |
+    |----------|--------|-------------|
+    | Creative Quality | 30% | 10 checks |
+    | Technical Setup | 25% | 2 checks |
+    | Bidding & Learning | 20% | 3 checks |
+    | Structure & Settings | 15% | 6 checks |
+    | Performance | 10% | 3 checks |
+
+    Search, Commerce & Tracking checks (3 checks) are scored within the categories above.
+
+    **Total: 28 checks (v1.5)**
+  </Tab>
+  <Tab title="Microsoft Ads">
+    | Category | Weight | Check count |
+    |----------|--------|-------------|
+    | Technical Setup | 25% | 3 checks |
+    | Syndication & Bidding | 20% | 4 checks |
+    | Structure & Audience | 20% | 3 checks |
+    | Creative & Extensions | 20% | 5 checks |
+    | Settings & Performance | 15% | 5 checks |
+
+    Import Safety, Compliance & Video checks (4 checks) are scored within the categories above.
+
+    **Total: 24 checks (v1.5)**
+  </Tab>
+</Tabs>
+
+## Grading thresholds
+
+The bands are intentionally wider than academic-style scoring because ad account health is typically distributed lower. A score of 75 or above represents a genuinely well-managed account.
+
+| Grade | Score | Label | Action required |
+|-------|-------|-------|-----------------|
+| A | 90–100 | Excellent | Minor optimizations only |
+| B | 75–89 | Good | Some improvement opportunities |
+| C | 60–74 | Needs improvement | Notable issues need attention |
+| D | 40–59 | Poor | Significant problems present |
+| F | &lt;40 | Critical | Urgent intervention required |
+
+## Cross-platform aggregate score
+
+When auditing multiple platforms, Claude Ads calculates each platform score separately, then combines them weighted by budget share:
+
+```text
+Aggregate Score = Σ(Platform_Score × Platform_Budget_Share)
+```
+
+**Example:**
+
+```text
+Google (82) × 40% + Meta (71) × 35% + LinkedIn (90) × 25%
+= 32.8 + 24.85 + 22.5
+= 80.15 → Grade B
+```
+
+## Cross-platform checks (v1.5)
+
+Three checks apply across all platforms simultaneously. They are scored at 100% weight in the aggregate score — not within any single platform.
+
+| ID | Check | Severity | Description |
+|----|-------|----------|-------------|
+| X-PI1 | Privacy infrastructure completeness | Critical | Consent Mode V2 (Google/MS) + CAPI (Meta) + Events API (TikTok) + AdAttributionKit (Apple). Without proper signals, no optimization works. |
+| X-CD1 | Creative diversity audit | High | Andromeda, Smart+, and PMax all use creative signals for targeting. Flags accounts with fewer than 5 genuinely distinct creative concepts. |
+| X-RF1 | Platform-appropriate refresh cadence | High | TikTok 7–10 days, Meta 14–21 days, LinkedIn 4–6 weeks, Google/MS 8–12 weeks. Flags overdue refreshes. |
+
+## Total check counts (v1.5)
+
+| Platform | v1.0 checks | v1.5 checks | Change |
+|----------|-------------|-------------|--------|
+| Google | 74 | 80 | +6 (AI Max, Demand Gen, CTV, PMax negatives) |
+| Meta | 46 | 50 | +4 (Andromeda, attribution, Incremental, Threads) |
+| LinkedIn | 25 | 27 | +2 (CRM, EU compliance) |
+| TikTok | 25 | 28 | +3 (Search, GMV Max, Events API) |
+| Microsoft | 20 | 24 | +4 (imports, Consent Mode, CTV, video) |
+| Apple | 35+ | 35+ | Scored within platform skill |
+| Cross-platform | 0 | 3 | +3 (privacy, creative diversity, refresh cadence) |
+| **Total** | **190** | **212** | **+22 new checks** |
+
+<Note>
+  Apple and YouTube checks are scored within their respective platform skill files, not in the reference audit checklists.
+</Note>
+
+## Quick Wins logic
+
+Quick Wins are the subset of failing checks worth fixing first — high severity but low remediation effort:
+
+```text
+IF severity == "Critical" OR severity == "High"
+AND estimated_remediation_time < 15 minutes
+THEN flag as "Quick Win"
+
+PRIORITY: Quick Wins sorted by (severity × estimated_impact) DESC
+```
+
+**Examples of Quick Wins:**
+
+| Fix | Severity | Est. time |
+|-----|----------|-----------|
+| Enable Enhanced Conversions | Critical | 5 min |
+| Turn on Search Ads Toggle (TikTok) | High | 2 min |
+| Add negative keyword lists | Critical | 10 min |
+| Fix location targeting method | Critical | 2 min |
+| Enable Advantage+ Placements | Medium | 2 min |

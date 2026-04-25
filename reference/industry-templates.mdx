@@ -1,0 +1,250 @@
+---
+title: "Industry Templates for Ad Planning"
+description: "Pre-built strategy frameworks for 12 business types, loaded automatically by /ads plan with platform mix, budgets, KPIs, and creative guidance."
+---
+
+When you run `/ads plan <type>`, Claude Ads loads a pre-built strategy framework tailored to your business model. These templates contain platform mix recommendations, campaign architecture, creative strategy, targeting guidelines, budget benchmarks, bidding strategy selection tables, and KPI targets — all calibrated to how each industry actually converts. This page describes what is inside each template and when to use each one.
+
+## How industry detection works
+
+Claude Ads can auto-detect your business type from signals present in your ad account data:
+
+| Business type | Detection signals |
+|--------------|-------------------|
+| SaaS | `trial_start` / `demo_request` events, pricing page targeting, long attribution windows |
+| E-commerce | `purchase` events, product catalog or feed, Shopping or PMax campaigns |
+| Local Service | Call extensions, location targeting, store visits, directions events |
+| B2B Enterprise | LinkedIn Ads active, ABM lists, high CPA tolerance ($50+), long sales cycle |
+| Info Products | Webinar or course funnels, lead gen forms, low-ticket offers |
+| Mobile App | App install campaigns, in-app events, deep linking |
+| Real Estate | Listing feeds, property-specific landing pages, geo-heavy targeting |
+| Healthcare | HIPAA compliance flags, healthcare-specific ad policies |
+| Finance | Special Ad Categories declared, financial products compliance |
+| Agency | Multiple client accounts, white-label reporting needs |
+
+<Tip>
+  Providing the business type explicitly with `/ads plan saas` or `/ads plan ecommerce` gives the most accurate results immediately. Auto-detection works well from account data, but explicit context removes ambiguity.
+</Tip>
+
+## All 12 templates
+
+<AccordionGroup>
+  <Accordion title="saas — SaaS">
+    **Primary goal:** Trial or demo request conversions
+
+    **Platform mix:** Google Search (35–45%) + LinkedIn (30–40%) as primaries, Meta (15–25%) for retargeting, YouTube and Microsoft for testing
+
+    **Key characteristics:**
+    - Long sales cycles (30–90+ days) require 30–90 day click attribution windows
+    - Competitor keyword bidding is critical — "best [competitor] alternative" queries
+    - Thought Leader Ads on LinkedIn reduce CPC from $13.23 to $2.29–$4.14
+    - CRM integration needed to track ad click → MQL → SQL → closed-won
+    - Target CPA strategy requires 30+ conversions/month; below that, use Maximize Clicks
+
+    **Budget benchmarks:** Google CPL $100–$200 · LinkedIn CPL $125 · Min $5,000/month
+
+    **Common pitfalls:** Optimizing for trial signups without tracking trial-to-paid conversion; not excluding existing customers; same landing page for all funnel stages
+  </Accordion>
+
+  <Accordion title="ecommerce — E-commerce">
+    **Primary goal:** ROAS-driven product sales
+
+    **Platform mix:** Meta (50–68%) as primary for Advantage+ Sales, Google Shopping/PMax (23–30%), TikTok (5–15%) for product discovery
+
+    **Key characteristics:**
+    - Product feed quality is foundational — garbage in, garbage out for PMax
+    - Advantage+ Sales Campaigns with 150+ creatives deliver 22% higher ROAS
+    - TikTok Shop available in 11 countries; CVR exceeds 10% vs 0.46% standard
+    - Q4 budget should increase 2–3x; start holiday campaigns in October, not November
+    - Creative refresh needed every 2–4 weeks (Meta fatigue compresses to 2–4 weeks)
+
+    **Budget benchmarks:** Google ROAS 3.68 · Meta median ROAS 2.19 · Min $3,000/month
+
+    **Common pitfalls:** Not segmenting products by margin tier; ignoring new vs returning customer tracking; measuring platform ROAS without blended MER check
+  </Accordion>
+
+  <Accordion title="local-service — Local Service">
+    **Primary goal:** Phone calls and booked jobs
+
+    **Platform mix:** Google LSA (40–50%) as primary for pay-per-lead, Google Search PPC (20–25%), Meta (15–20%) for local awareness
+
+    **Key characteristics:**
+    - LSA (Local Services Ads) delivers the cheapest leads at $25–$75 CPL with Google Guaranteed badge
+    - Call tracking is mandatory — separate numbers for LSA vs Search vs Meta
+    - Emergency keywords tolerate higher CPC bids than non-emergency terms
+    - Ad schedule must match business hours unless 24/7 service
+    - Seasonal budget adjustments required (HVAC, plumbing, roofing, landscaping)
+
+    **Budget benchmarks:** Google Search CPL $90.92 · LSA CPL $25–$75 · Min $1,500/month
+
+    **Common pitfalls:** Under-investing in LSA; targeting radius too wide; no call tracking; running ads outside business hours without after-hours answering
+  </Accordion>
+
+  <Accordion title="b2b-enterprise — B2B Enterprise">
+    **Primary goal:** Pipeline generated, not lead volume
+
+    **Platform mix:** LinkedIn (40–55%) as primary for ABM, Google Search (25–35%), ABM Display (10–15%)
+
+    **Key characteristics:**
+    - Average of 6–10 stakeholders per deal; target the full buying committee
+    - Thought Leader Ads: exec-authored content at $2.29–$4.14 CPC vs $13.23 standard
+    - Attribution window minimum 90 days — enterprise sales cycles make 7-day windows useless
+    - ABM tiering: Tier 1 (10–50 accounts, $500–$2,000/month each) through Tier 3 (200–1,000 accounts)
+    - MQA (Marketing Qualified Account) matters more than MQL count
+
+    **Budget benchmarks:** LinkedIn CPL $60–$150+ · Google CPL (B2B SaaS) $100–$200 · Min $10,000/month
+
+    **Common pitfalls:** LinkedIn targeting too narrow (&lt;50K audience); not using Thought Leader Ads; short attribution windows; no CRM integration
+  </Accordion>
+
+  <Accordion title="info-products — Info Products & Courses">
+    **Primary goal:** Lead magnet opt-ins, webinar registrations, course sales
+
+    **Platform mix:** Meta (35–40%) and YouTube (35–40%) as co-primaries, Email (15–20%) supporting, TikTok for testing
+
+    **Key characteristics:**
+    - Founder-to-camera video is the highest-performing creative format
+    - Webinar or VSL funnels dominate high-ticket ($500–$5,000+) offers
+    - Retargeting is critical — segment by funnel stage (webinar registrant, sales page visitor, cart abandoner)
+    - Front-end ROAS often looks terrible; backend email sales complete the picture
+    - TikTok requires minimum $50/day campaign budget
+
+    **Budget benchmarks:** Meta CPL (lead magnet) $2–$8 · Meta CPA (core offer) $30–$100 · Min $2,000/month
+
+    **Common pitfalls:** Spending on cold traffic to sales page without warm-up funnel; same creative running for 60+ days; ignoring email nurture sequences
+  </Accordion>
+
+  <Accordion title="mobile-app — Mobile App">
+    **Primary goal:** App installs, then post-install events (registration, subscription, purchase)
+
+    **Platform mix:** Apple Ads (25–30%) for high-intent App Store searches, Google UAC (25–30%) for cross-network reach, Meta (20–25%), TikTok (15–20%)
+
+    **Key characteristics:**
+    - MMP (Mobile Measurement Partner) required: AppsFlyer, Adjust, Branch, or Singular
+    - Optimize for post-install events, not raw installs — LTV > CPI × 3 for sustainable growth
+    - SKAdNetwork (iOS) limits attribution to 63 conversion values with 24–48h delay
+    - Deep linking required: deferred deep links for new users, standard for re-engagement
+    - Google UAC minimum $50/day — below this the algorithm cannot learn
+
+    **Budget benchmarks:** Meta CPI (iOS) $3–$8 · Apple Ads CPI $2–$5 · Min $5,000/month
+
+    **Common pitfalls:** Optimizing for installs instead of post-install events; no MMP; budget too low for Google UAC; not configuring SKAdNetwork postbacks
+  </Accordion>
+
+  <Accordion title="real-estate — Real Estate">
+    **Primary goal:** Buyer leads and seller listing appointments
+
+    **Platform mix:** Meta Lead Forms (40–50%) as primary, Google Search (30–40%), LinkedIn and YouTube for testing
+
+    **Key characteristics:**
+    - **Special Ad Category (Housing)** required on Meta — no age, gender, ZIP code targeting; minimum 15-mile radius; no Lookalike Audiences
+    - Run separate campaigns for buyers and sellers — different intent, different creative
+    - Drone footage and property tour videos are the highest-performing creative formats
+    - Listing feed integration enables dynamic ads that auto-update listing status
+    - Agent personal brand matters as much as brokerage brand
+
+    **Budget benchmarks:** Meta CPL (buyer) $5–$25 · Meta CPL (seller) $15–$50 · Min $2,500/month
+
+    **Common pitfalls:** Not declaring Special Ad Category (account suspension risk); same campaigns for buyers and sellers; listing ads for properties already under contract
+  </Accordion>
+
+  <Accordion title="healthcare — Healthcare">
+    **Primary goal:** Appointment bookings and new patient acquisition
+
+    **Platform mix:** Google Search (50–60%) as primary, Meta (20–25%), YouTube (10–15%) for patient education
+
+    **Key characteristics:**
+    - **HIPAA compliance**: never use patient data for ad targeting without explicit written authorization
+    - **LegitScript certification** required for addiction treatment and online pharmacy — 4–8 week process, $1,000–$2,000/year
+    - Cannot target by specific health conditions on any platform
+    - Call tracking with dedicated numbers per campaign is essential
+    - Microsoft Ads suits the 45–64 age group (38% of Bing searches)
+
+    **Budget benchmarks:** Google CPC $10–$40+ · Cost per new patient $100–$500 · Min $4,000/month
+
+    **Common pitfalls:** Violating HIPAA in retargeting; not obtaining LegitScript certification; promising specific medical outcomes in ad copy; no call tracking
+  </Accordion>
+
+  <Accordion title="finance — Finance">
+    **Primary goal:** Qualified applications and funded accounts
+
+    **Platform mix:** Google Search (40–50%) as primary, LinkedIn (20–30%) for B2B finance, Meta (15%) for awareness
+
+    **Key characteristics:**
+    - **Special Ad Category (Credit)** on Meta for loans, mortgages, and credit cards — no age, gender, or ZIP code targeting
+    - Google requires APR, fees, and repayment terms displayed for lending ads
+    - Compliance review adds 3–7 days to creative production; maintain a pre-approved copy library
+    - Crypto ads require Google certification in approved countries
+    - Meta CPM is the highest across all industries at $50
+
+    **Budget benchmarks:** Google CVR 2.55–3.50% · Meta CPM $50 · Min $8,000/month
+
+    **Common pitfalls:** Not declaring Special Ad Category for credit products; missing required disclosures; promising guaranteed returns; state-specific licensing not met
+  </Accordion>
+
+  <Accordion title="agency — Agency">
+    **Primary goal:** Multi-client management with scalable, standardized processes
+
+    **Platform mix:** Varies per client — use the relevant industry template for each client account
+
+    **Key characteristics:**
+    - Map each client to the appropriate industry template on intake
+    - Standardized campaign naming: `[Client]_[Platform]_[Objective]_[Audience]_[Geo]_[Date]`
+    - QBR cadence: monthly client reports + quarterly business reviews with MER analysis
+    - LinkedIn Accelerate delivers 42% lower CPA for B2B clients
+    - Budget allocation by client size: under $3,000/month → Google Search only; $10,000+/month → full platform mix
+
+    **Key operations:** Weekly spend pacing check, bi-weekly creative refresh assessment, monthly full performance review, quarterly platform mix evaluation
+
+    **Common pitfalls:** No standardized onboarding; reporting vanity metrics instead of business outcomes; no creative production pipeline; over-promising ROAS targets in sales process
+  </Accordion>
+
+  <Accordion title="generic — Generic">
+    **Primary goal:** Determined by platform selection questionnaire
+
+    **Platform mix:** Chosen based on questionnaire answers (search intent → Google; visual/B2C → Meta/TikTok; B2B → LinkedIn)
+
+    **Key characteristics:**
+    - Includes a platform selection questionnaire to determine the right mix for your specific situation
+    - Universal 70/20/10 budget rule: 70% proven channels, 20% scaling, 10% testing
+    - Four-phase implementation roadmap: Foundation (weeks 1–2) → Learn (weeks 3–6) → Optimize (weeks 7–12) → Scale (months 4–6)
+    - Universal negative keyword lists for Google/Microsoft included
+    - Applies the 3x Kill Rule and 20% scaling rule across all platforms
+
+    **Common pitfalls:** Launching on too many platforms with limited budget; not installing conversion tracking before spending; changing too many variables at once
+  </Accordion>
+
+  <Accordion title="ecommerce-creative — E-commerce Creative Playbook">
+    **Primary goal:** Creative asset production for five e-commerce campaign types
+
+    **Campaign types covered:**
+    - **Product Launch** — hero shot, lifestyle image, UGC unboxing (AIDA copy framework); 30–40% of budget
+    - **Sale / Promotion** — bold sale banners, countdown overlays, bundle carousels (PAS framework); 20–30% of budget
+    - **Seasonal** — themed hero images, gift guide carousels, limited edition spotlights (BAB framework); 15–25% of budget
+    - **Retargeting** — dynamic product ads, cart abandonment reminders, cross-sell carousels (PAS framework); 10–15% of budget
+    - **Brand Awareness** — cinematic brand story video, UGC compilation reels (Star-Story-Solution framework); 10–15% of budget
+
+    **Key characteristics:**
+    - Each campaign type maps to specific copy frameworks from `copy-frameworks.md`
+    - Platform-specific creative rules included for Meta, Google, TikTok, and LinkedIn
+    - A/B testing matrix with three test variables per campaign type
+    - Minimum test duration: 7 days or 1,000 impressions per variant
+
+    **Common pitfalls:** Repurposing landscape content on TikTok (underperforms 40–60%); text overlay exceeding 20% on Meta images; RSA headlines without keyword inclusion
+  </Accordion>
+</AccordionGroup>
+
+## When to specify vs. let auto-detection decide
+
+<CardGroup cols={2}>
+  <Card title="Use explicit type" icon="terminal">
+    You know your business model well and want the most targeted recommendations immediately. Run `/ads plan saas`, `/ads plan healthcare`, etc.
+  </Card>
+  <Card title="Let auto-detection run" icon="cpu">
+    You are auditing an unfamiliar account or want Claude Ads to confirm your assumed business type from actual account signals before loading a template.
+  </Card>
+</CardGroup>
+
+<Note>
+  Auto-detection reads conversion event names, campaign types, targeting patterns, and active platforms. It works best when you share account exports or screenshots alongside your request.
+</Note>

@@ -1,0 +1,196 @@
+---
+title: "LinkedIn Ads Deep Analysis with /ads linkedin"
+description: "Audit 27 LinkedIn Ads checks covering B2B targeting, Thought Leader Ads, Lead Gen Forms, CRM attribution, and bidding strategy for sponsored content."
+---
+
+The `/ads linkedin` command runs a full LinkedIn Ads audit built for B2B advertising. It evaluates 27 checks across six weighted categories and produces a `LINKEDIN-ADS-REPORT.md` covering the Insight Tag, Conversions API, audience targeting precision, Thought Leader Ad adoption, Lead Gen Form optimization, CRM revenue attribution, and EU messaging compliance. LinkedIn's highest value comes from its professional targeting data and Thought Leader Ads—the audit surfaces whether you're using either to full effect.
+
+<Note>
+  LinkedIn renamed its hierarchy in October 2025: Campaign Groups are now called **Campaigns**, and Campaigns are now called **Ad Sets**. This documentation and the audit output use the new terminology.
+</Note>
+
+## Scope
+
+`/ads linkedin` covers all LinkedIn campaign formats for B2B advertisers:
+
+- Sponsored Content (Single Image, Video, Document, Carousel)
+- Thought Leader Ads (TLA) from employees and non-employee members (since March 2025)
+- Lead Gen Forms with CRM integration
+- Message Ads and Conversation Ads (EU restrictions apply)
+- Account-Based Marketing (ABM) with company lists
+- Predictive Audiences (replaced Lookalike Audiences February 2024)
+- CTV placements via LinkedIn partnerships (2025)
+
+## Category breakdown and weights
+
+<Tabs>
+  <Tab title="Technical Setup — 25%">
+    **2 checks: L01–L02**
+
+    LinkedIn attribution depends entirely on having proper tracking in place. Without the Insight Tag, no conversion data flows back to campaigns.
+
+    | Check | Description | Severity |
+    |-------|-------------|----------|
+    | L01 | Insight Tag installed and firing on all pages | Critical |
+    | L02 | Conversions API (CAPI) active (launched 2025) | High |
+
+    The LinkedIn CAPI launched in 2025 and functions similarly to Meta's CAPI—it sends server-side conversion signals directly to LinkedIn, reducing dependence on client-side cookies and improving attribution accuracy for B2B sales cycles with long attribution windows.
+  </Tab>
+  <Tab title="Audience Quality — 25%">
+    **7 checks: L03–L09**
+
+    LinkedIn's targeting precision is its primary competitive advantage over other platforms. The audit verifies that the account is using that precision intentionally, not defaulting to broad settings.
+
+    | Check | Description | Severity |
+    |-------|-------------|----------|
+    | L03 | Job title targeting uses specific titles, not just functions | High |
+    | L04 | Company size filtering matches ICP | Medium |
+    | L05 | Seniority level appropriate for offer (C-suite for enterprise, Manager for mid-market) | High |
+    | L06 | Matched Audiences active: website retargeting + contact lists | High |
+    | L07 | ABM company lists uploaded (up to 300,000 companies) for enterprise campaigns | Medium |
+    | L08 | Audience Expansion set intentionally (OFF for ABM precision, ON for scale) | Medium |
+    | L09 | Predictive Audiences tested (replaced Lookalike Audiences February 2024; 21% CPL reduction) | Medium |
+
+    <Warning>
+      Audience Expansion on ABM campaigns can be catastrophic. One documented case showed 96% of budget going to just 3 accounts out of 400 targeted (AJ Wilcox, B2Linked). Always uncheck Audience Expansion for ABM campaigns.
+    </Warning>
+  </Tab>
+  <Tab title="Creative & Formats — 20%">
+    **4 checks: L10–L13**
+
+    Thought Leader Ads are the single highest-ROI LinkedIn format for B2B advertisers. They use personal posts from employees or external members as sponsored content, delivering 2–5× higher engagement than corporate-branded ads at a fraction of the CPC.
+
+    | Check | Description | Severity |
+    |-------|-------------|----------|
+    | L10 | Thought Leader Ads active, receiving ≥30% of LinkedIn budget for B2B | High |
+    | L11 | Ad format diversity: ≥2 formats tested (Single Image, Video, Document, Carousel) | High |
+    | L12 | Video ads tested | Medium |
+    | L13 | Creative refreshed every 4–6 weeks | Medium |
+
+    **TLA economics:**
+
+    | Format | Average CPC |
+    |--------|-------------|
+    | Thought Leader Ads | $2.29–$4.14 |
+    | Standard Sponsored Content | $13.23 |
+
+    TLAs expanded to non-employee members in March 2025, enabling customer testimonial UGC as sponsored content without requiring the featured person to be a company employee.
+
+    **Format benchmarks:**
+
+    | Format | Key metric |
+    |--------|-----------|
+    | Document Ads | 7.00% engagement rate (14% YoY increase) |
+    | Conversation Ads | 50–60% open rate, 2–5% CTR |
+  </Tab>
+  <Tab title="Lead Gen Forms — 15%">
+    **2 checks: L14–L15**
+
+    LinkedIn Lead Gen Forms convert at 13%—roughly 3.25× higher than landing pages—because they pre-fill profile data. That advantage disappears with too many fields.
+
+    | Check | Description | Severity |
+    |-------|-------------|----------|
+    | L14 | Lead Gen Form ≤5 fields (13% CVR benchmark; each additional field reduces CVR) | High |
+    | L15 | Lead Gen Form synced to CRM in real-time (not manual CSV download) | High |
+
+    Each field beyond 5 reduces form CVR significantly. The audit flags forms with >5 fields as High severity.
+  </Tab>
+  <Tab title="Bidding & Budget — 15%">
+    **2 checks: L16–L17**
+
+    LinkedIn's Maximum Delivery bid strategy is the most expensive option and the default. Starting with Manual CPC gives cost control while you build conversion data.
+
+    | Check | Description | Severity |
+    |-------|-------------|----------|
+    | L16 | Bid strategy appropriate (Manual CPC or Cost Cap, not Maximum Delivery as default) | High |
+    | L17 | Daily budget ≥$50 for Sponsored Content | High |
+
+    Strategy progression: Manual CPC → Cost Cap (once CPA data is established) → Maximum Delivery only for campaigns with sufficient conversion volume to validate.
+  </Tab>
+  <Tab title="CRM & Compliance — 10%">
+    **2 checks: L-CRM1, L-EU1 (v1.5)**
+
+    New in v1.5. CRM integration enables closed-loop revenue attribution—tracing each impression through to closed revenue. EU Sponsored Messaging compliance prevents wasted spend on ad types that cannot deliver to EU audiences.
+
+    | Check | Description | Severity |
+    |-------|-------------|----------|
+    | L-CRM1 | Salesforce or HubSpot CRM integration configured (launched June 2025) for closed-loop impression-to-revenue reporting | High |
+    | L-EU1 | No Message Ads or Conversation Ads targeting EU audiences (EU Sponsored Messaging discontinued January 2022) | Medium |
+
+    <Warning>
+      Message Ads and Conversation Ads do not deliver to EU audiences. They have been discontinued for EU targeting since January 2022. Campaigns configured to target EU audiences with these formats will not deliver and spend will not be used—resulting in missed reach, not wasted spend. Flag any such configuration as a campaign setup error.
+    </Warning>
+  </Tab>
+</Tabs>
+
+## Structure & performance checks
+
+Eight additional checks (L18–L25) are scored across the primary categories above and cover campaign objective alignment, A/B testing activity, message frequency, CTR benchmarks, CPC benchmarks, lead quality tracking, attribution windows, and demographics report review.
+
+| Check | Description | Severity |
+|-------|-------------|----------|
+| L18 | Ad Set objective matches funnel stage | High |
+| L19 | Active A/B test on creative or audience | Medium |
+| L20 | Message frequency ≤1 per 30–45 days per user (inbox fatigue threshold) | High |
+| L21 | Sponsored Content CTR ≥0.44% | High |
+| L22 | CPC within industry benchmark ($5–7 average, senior $6.40+) | Medium |
+| L23 | Lead-to-opportunity rate tracked (not just CPL) | High |
+| L24 | Attribution window: 30-day click / 7-day view configured | Medium |
+| L25 | Job title and company demographics report reviewed monthly | Medium |
+
+## Quality rules enforced
+
+<CardGroup cols={2}>
+  <Card title="Manual CPC first" icon="hand-pointer">
+    Maximum Delivery is the most expensive LinkedIn bid option and is the default. The audit always flags accounts using Maximum Delivery without first establishing CPA benchmarks via Manual CPC. Start manual, collect data, then graduate to automated bidding.
+  </Card>
+  <Card title="EU messaging compliance" icon="shield">
+    EU Sponsored Messaging (Message Ads and Conversation Ads) has been discontinued for EU audiences since January 2022. Any campaign targeting EU users with these formats is flagged regardless of spend level.
+  </Card>
+</CardGroup>
+
+## Key thresholds
+
+| Metric | Pass | Warning | Fail |
+|--------|------|---------|------|
+| CTR (Sponsored Content) | ≥0.44% | 0.30–0.44% | &lt;0.30% |
+| CPC (average) | ≤$7.00 | $7–$10 | >$10.00 |
+| Lead Gen Form CVR | ≥10% | 5–10% | &lt;5% |
+| Message frequency | ≤1/30 days | 1/15–30 days | >1/15 days |
+| TLA budget share | ≥30% | 15–30% | &lt;15% |
+
+## LinkedIn platform context
+
+| Fact | Value |
+|------|-------|
+| Minimum audience size for delivery | 500 members |
+| Recommended audience size | 50,000–300,000 |
+| Lead Gen Form CVR benchmark | 13% (3.25× landing pages) |
+| TLA CPC range | $2.29–$4.14 |
+| Standard Sponsored Content CPC | $13.23 average |
+| Predictive Audiences seed size | 300+ members |
+| Company list upload limit | 300,000 |
+| Lookalike Audiences | Discontinued February 29, 2024 |
+| Accelerate Ad Sets | 42% lower CPA, 21% lower CPL |
+| B2B ROAS benchmark | 113% ($1.13 per $1 spent) |
+
+## Quick wins
+
+| Check | Fix | Time |
+|-------|-----|------|
+| L01: Insight Tag | Install/verify Insight Tag on all pages | 10 min |
+| L10: Thought Leader Ads | Create TLA from employee organic posts | 10 min |
+| L14: Lead Gen Form fields | Reduce form to ≤5 fields | 5 min |
+| L08: Audience expansion | Set intentionally OFF for ABM campaigns | 2 min |
+| L20: Message frequency | Set frequency cap to 1 per 30–45 days | 2 min |
+| L24: Attribution window | Configure 30-day click / 7-day view | 2 min |
+
+## Output
+
+Running `/ads linkedin` produces:
+
+- **`LINKEDIN-ADS-REPORT.md`**: Full 27-check findings with per-category scores and pass/warning/fail table
+- **TLA adoption roadmap**: If Thought Leader Ads are not active, a prioritized plan for launching them with specific employee selection criteria and budget allocation recommendations
+- **ABM strategy recommendations**: Company list segmentation, per-tier messaging, and account penetration tracking for B2B enterprise accounts
+- **Lead Gen Form optimization priorities**: Field reduction, CRM sync verification, and CVR improvement steps
+- **Quick Wins**: Sorted by severity × estimated impact

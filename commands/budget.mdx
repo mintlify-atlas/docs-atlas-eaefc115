@@ -1,0 +1,220 @@
+---
+title: "Budget Allocation & Bidding Strategy Review"
+description: "Evaluate spend distribution, validate bidding strategies, check platform budget sufficiency, and produce a prioritized kill list and scale list."
+---
+
+Running `/ads budget` evaluates how your advertising spend is distributed across platforms and whether each campaign's bidding strategy matches its conversion volume. It applies the 70/20/10 allocation framework, checks platform-specific budget sufficiency rules, and produces a prioritized kill list and scale list so you know exactly where to move money next.
+
+## Command
+
+```bash
+/ads budget
+```
+
+Provide your current spend and performance data (last 30 days minimum) when prompted. Exports from your ad platforms, pasted metrics, or live data via MCP all work.
+
+<Info>
+  Claude validates that spend data covers at least 14 days before making kill or scale recommendations. Kill list candidates must have at least 20 clicks or $100 in spend before being flagged for pause.
+</Info>
+
+## What it analyzes
+
+### Platform budget distribution
+
+Claude compares your current spend allocation against the recommended mix for your business type, then identifies misallocations.
+
+| Business type | Primary | Secondary | Testing |
+|---------------|---------|-----------|---------|
+| SaaS B2B | Google Search, LinkedIn | Meta, YouTube | TikTok, Microsoft |
+| E-commerce | Google Shopping, Meta | TikTok, YouTube | Microsoft, LinkedIn |
+| Local service | Google Search, Google LSA | Meta | Microsoft, YouTube |
+| B2B enterprise | LinkedIn, Google Search | Meta | Microsoft, TikTok |
+| Info products | Meta, YouTube | Google Search | TikTok |
+| Mobile app | Meta, Google UAC | TikTok | Apple Ads |
+| Real estate | Google Search, Meta | YouTube | Microsoft |
+| Healthcare | Google Search | Meta | Microsoft, YouTube |
+| Finance | Google Search, Meta | LinkedIn | Microsoft |
+
+### 70/20/10 framework
+
+Every budget allocation Claude recommends follows this distribution:
+
+```
+70% → Proven performers (campaigns with consistent ROAS or CPA at target)
+20% → Promising growth (campaigns showing traction, need more data)
+10% → Experiments (new platforms, audiences, or formats)
+```
+
+## Budget sufficiency checks
+
+Each platform has minimum budget requirements for its algorithm to exit the learning phase and deliver reliable results. Claude flags any ad set or campaign that falls below these thresholds.
+
+| Platform | Minimum daily | Learning phase requirement |
+|----------|--------------|--------------------------|
+| Google Search | $20/day | Sufficient for 15+ conversions/month |
+| Google PMax | $50/day | Sufficient for algorithm optimization |
+| Meta | $20/day per ad set | ≥5× target CPA per ad set |
+| LinkedIn | $50/day Sponsored Content | 15+ conversions/month |
+| TikTok | $50/day campaign, $20/day ad group | ≥50× target CPA per ad group |
+| Microsoft | No strict minimum | Sufficient for stable delivery |
+
+<Warning>
+  Never recommend Broad Match keywords without Smart Bidding active on Google. This is a hard quality gate that Claude enforces on every budget review regardless of account size or budget level.
+</Warning>
+
+## Bidding strategy selection
+
+### Google Ads decision tree
+
+```
+START → Conversions in last 30 days?
+
+< 15 conversions
+  → Maximize Clicks (set Max CPC = Target_CPA / (CVR × 1.5))
+  → Transition to Maximize Conversions once 15+ conversions achieved
+
+15–29 conversions
+  → Maximize Conversions (uncapped)
+  → Transition to Target CPA when CPA standard deviation < 20% over 14 days
+
+30+ conversions, no dynamic values
+  → Target CPA
+  → Set at 1.1–1.2× historical CPA
+  → Adjust no more than 10% every 14 days
+
+50+ conversions with dynamic revenue values
+  → Target ROAS
+  → Requires dynamic conversion values configured
+  → Set at exact historical ROAS
+
+Brand protection
+  → Target Impression Share at 95–100%
+  → No conversion data requirement
+```
+
+<Note>
+  Enhanced CPC (eCPC) was fully removed from Google Ads in March 2025. Claude will never recommend it and will flag any account still referencing it as a misconfiguration.
+</Note>
+
+### Meta Ads bidding
+
+<Tabs>
+  <Tab title="Lowest Cost">
+    The default for 90% of campaigns. Maximizes conversion volume within budget. CPA can spike during high-competition periods like Q4. Best starting point for new campaigns and audience testing.
+  </Tab>
+  <Tab title="Cost Cap">
+    Sets a CPA ceiling. May reduce delivery volume if the cap is set too aggressively. Set at 1.2–1.5× your target CPA for stable delivery. Best for scaling campaigns with margin protection.
+  </Tab>
+  <Tab title="Bid Cap">
+    Controls the maximum bid per auction, not average CPA. Set at 2–3× target CPA initially. Experienced advertisers only. Risk: significant under-delivery if set too low.
+  </Tab>
+  <Tab title="ROAS Goal">
+    Target return on ad spend. Requires purchase event with dynamic conversion values. Best for Advantage+ Sales campaigns. Recommended for e-commerce accounts tracking revenue accurately.
+  </Tab>
+</Tabs>
+
+**CBO vs ABO decision:**
+
+| Daily budget | Recommendation |
+|-------------|----------------|
+| < $100 | ABO (manual control for testing) |
+| $100–$500 | Test both; CBO if audiences are similar |
+| > $500 | CBO — let Meta optimize distribution |
+
+### LinkedIn Ads bidding
+
+| Strategy | Best for |
+|----------|----------|
+| Manual CPC | Default starting point for cost control |
+| Cost Cap | Efficiency at scale with predictable CPA |
+| Maximum Delivery | Highest volume; most expensive. Use only with established data |
+| Target Cost | Predictable CPA at steady state |
+| CPS (Cost Per Send) | Message Ads — bid aggressively for limited inbox slots |
+
+### TikTok Ads bidding
+
+| Strategy | When to use |
+|----------|-------------|
+| Lowest Cost | Volume maximization; most common starting point |
+| Cost Cap | Margin protection; set target CPA and system stays near it |
+| Bid Cap | Retargeting and competitive niches; set at 2–3× target CPA |
+| Smart+ Modular | Partial AI control — lock targeting, creative, budget, or placement independently |
+
+TikTok budget must be ≥50× target CPA per ad group for the learning phase to exit reliably.
+
+### Microsoft Ads bidding
+
+Mirror your Google strategy but set CPC targets 20–35% lower. Target CPA and Target ROAS require 15+ conversions in 30 days. Enable Copilot placement for PMax campaigns — early data shows 73% higher CTR versus standard placements.
+
+## Scaling assessment
+
+### Ready to scale (green light)
+
+- CPA consistently below target for 2+ weeks
+- 50+ conversions per week (learning phase exited)
+- CTR stable or improving
+- ROAS above target
+- No creative fatigue signals
+
+### The 20% rule
+
+Never increase any campaign budget by more than 20% at a time. Wait 3–5 days after each increase before making another adjustment.
+
+```
+Week 1: $100/day → $120/day
+Week 2: $120/day → $144/day
+Week 3: $144/day → $173/day
+```
+
+On Meta, exceeding 20% resets the learning phase for that ad set — a costly disruption for campaigns that have already accumulated conversion data.
+
+### Scaling methods
+
+1. **Vertical** — increase budget on winning campaigns (20% rule)
+2. **Horizontal** — duplicate winning campaigns to new audiences
+3. **Platform expansion** — add budget allocation to new platforms
+4. **Geographic expansion** — test new markets and regions
+5. **Format expansion** — test new ad formats on existing platforms
+
+## Kill list assessment
+
+### 3x Kill Rule
+
+Any campaign or ad group with CPA greater than 3× target is flagged for immediate pause.
+
+| Scenario | Data required | Action |
+|----------|---------------|--------|
+| CPA >3× target | ≥7 days data, ≥20 clicks | Pause immediately |
+| No conversions | ≥$100 spend or ≥50 clicks | Pause and diagnose |
+| CTR &lt;50% of platform benchmark | ≥1,000 impressions | Kill creative, test new |
+| ROAS &lt;50% of target | ≥14 days data | Reduce budget 50% or pause |
+
+## MER: Marketing Efficiency Ratio
+
+Claude calculates blended efficiency across all platforms — not just per-platform ROAS — using MER.
+
+```
+MER = Total Revenue / Total Marketing Spend
+```
+
+| Business type | Healthy MER | Excellent MER | Danger zone |
+|--------------|-------------|---------------|-------------|
+| E-commerce | 3.0–5.0× | >5.0× | &lt;2.0× |
+| SaaS | 3:1 LTV:CAC | >4:1 | &lt;2:1 |
+| Local service | 3–8× | >8× | &lt;1.5× |
+
+<Tip>
+  Platform-reported ROAS overclaims by 20–40% due to attribution overlap. Always cross-reference with MER and at least one other data source (CRM revenue, post-purchase survey) before making budget decisions.
+</Tip>
+
+## Output report
+
+Claude produces a `BUDGET-STRATEGY-REPORT.md` with the following sections:
+
+- **Allocation health scorecard** — rated across allocation strategy, bidding strategy selection, scaling readiness, and budget sufficiency
+- **Current vs recommended budget split** — per-platform breakdown
+- **Bidding strategy recommendations** — per campaign with transition triggers
+- **Scale list** — campaigns ready for additional budget with suggested increase amounts
+- **Kill list** — campaigns and ad groups to pause immediately with reasons
+- **MER analysis** — blended efficiency trend across all platforms
+- **Quick wins** — highest-impact budget changes to make this week

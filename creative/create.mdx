@@ -1,0 +1,155 @@
+---
+title: "Generate Campaign Concepts and Copy Briefs"
+description: "Run /ads create to orchestrate 4 AI agents that produce campaign concepts, platform copy decks, and image generation briefs from your brand-profile.json."
+---
+
+`/ads create` is the second step of the creative pipeline. It reads `brand-profile.json` produced by `/ads dna` — and optionally any audit results present in the directory — then orchestrates two agents in sequence to produce `campaign-brief.md`. That file contains everything `/ads generate` needs: structured campaign concepts, a platform-specific copy deck, and precise image generation briefs.
+
+## Usage
+
+```bash
+/ads create
+```
+
+```bash
+# Limit to specific platforms
+/ads create --platforms meta google
+
+# Optimize for a specific objective
+/ads create --objective leads
+```
+
+## What it needs
+
+Before running, `/ads create` looks for:
+
+- `brand-profile.json` in the current directory (from `/ads dna`). If not found, it offers to accept a manual brand description instead.
+- Any `ADS-AUDIT-REPORT.md` or `*-audit-results.md` files in the current directory. If found, the top 3 weaknesses (creative fatigue, tracking gaps, wasted spend) are passed to the `creative-strategist` agent so that at least two of the generated concepts directly address them.
+
+## The agent sequence
+
+`/ads create` spawns two agents **sequentially** — `copy-writer` reads the file that `creative-strategist` writes, so running them in parallel would create a race condition on `campaign-brief.md`.
+
+### Step 1: creative-strategist
+
+The `creative-strategist` agent (Opus, up to 25 turns) reads `brand-profile.json`, loads the voice-to-style reference, and generates 3–5 campaign concepts. For each concept it produces:
+
+- A hypothesis grounded in brand data or audit findings
+- A primary message and tone reading (e.g., "formal 7/10, bold 8/10")
+- A selected copy framework for the `copy-writer` to apply
+- **Two visual direction variants**: Direction A (photography-based, banana Product or Portrait mode) and Direction B (illustration/graphic-based, banana UI/Web or Abstract mode)
+- Target platforms and rationale
+- An image generation brief per concept × platform combination, with exact prompt text, dimensions, aspect ratio, banana domain mode, and safe zone notes
+
+### Step 2: copy-writer
+
+After `creative-strategist` completes, the `copy-writer` agent (Sonnet, up to 20 turns) reads the concepts and appends a `## Copy Deck` section to `campaign-brief.md`. It generates:
+
+- **5 headline variants** per concept per platform (ordered most direct → most creative)
+- **3 primary text variants** (short → medium → punchy)
+- **3 CTA options**
+- **2 framework variants**: a primary (recommended) and a secondary for A/B testing
+
+Every line is validated against platform character limits before being written. Character counts appear in parentheses after each line.
+
+## The 6 copy frameworks
+
+The `creative-strategist` selects one framework per concept based on campaign goal and audience temperature. The `copy-writer` applies that framework's structure to all copy for that concept.
+
+<Tabs>
+  <Tab title="AIDA">
+    **Attention, Interest, Desire, Action**
+
+    Best for cold audiences and awareness campaigns. Leads with a pattern interrupt, builds interest with a detail, creates desire with a benefit, and closes with a single CTA.
+
+    *Platform fit: Meta, Google RSA, YouTube pre-roll*
+  </Tab>
+  <Tab title="PAS">
+    **Problem, Agitate, Solution**
+
+    Best for pain-point products and retargeting. States the problem plainly, makes the consequence feel real, then presents the brand as the natural relief.
+
+    *Platform fit: Meta Feed, LinkedIn, Google RSA*
+  </Tab>
+  <Tab title="BAB">
+    **Before, After, Bridge**
+
+    Best for transformation offers — coaching, fitness, lifestyle. Paints the before state, shows the after state, then bridges the two with the product.
+
+    *Platform fit: Meta Stories and Reels, TikTok, YouTube*
+  </Tab>
+  <Tab title="4P">
+    **Promise, Picture, Proof, Push**
+
+    Best for high-ticket items and B2B. Makes a bold promise, pictures the outcome, backs it with a specific stat or social proof, then pushes a CTA.
+
+    *Platform fit: LinkedIn InMail, Google RSA*
+  </Tab>
+  <Tab title="FAB">
+    **Features, Advantages, Benefits**
+
+    Best for technical products and comparison shoppers. Every feature is connected to an advantage over alternatives and translated into a tangible user benefit.
+
+    *Platform fit: Google RSA (high intent), LinkedIn technical buyers*
+  </Tab>
+  <Tab title="Star-Story-Solution">
+    **Star, Story, Solution**
+
+    Best for brand storytelling and UGC-style content. Introduces a relatable character, narrates a challenge they face, and resolves it with the product.
+
+    *Platform fit: Meta Reels and Stories, TikTok, YouTube*
+  </Tab>
+</Tabs>
+
+## Platform copy limits
+
+The `copy-writer` agent enforces these limits and shows character counts inline:
+
+| Platform | Component | Recommended limit |
+|----------|-----------|------------------|
+| Google RSA | Headlines | 30 chars each (write 8+) |
+| Google RSA | Descriptions | 90 chars each (write 3+) |
+| Meta | Primary Text | 125 chars (truncated on mobile) |
+| Meta | Headline | 40 chars |
+| Meta Reels | Primary Text | 72 chars visible |
+| LinkedIn | Intro text | 150 chars recommended |
+| LinkedIn | Headline | 70 chars recommended |
+| TikTok | Ad text | 100 chars |
+| YouTube | CTA button | 10 chars |
+| Microsoft RSA | Headlines | 30 chars each |
+
+## Output: campaign-brief.md
+
+The file is written to `./campaign-brief.md` and follows a strict heading structure that downstream agents parse programmatically. The key sections are:
+
+```
+# Campaign Brief: [brand_name]
+
+## Brand DNA Summary
+## Audit Context
+## Campaign Concepts
+  ### Concept 1: [Name]
+  ### Concept 2: [Name]
+## Copy Deck
+  (appended by copy-writer)
+## Image Generation Briefs
+  ### Brief 1: [Concept] - [Platform]
+  ### Brief 2: [Concept] - [Platform]
+## Next Steps
+```
+
+<Warning>
+  Do not rename or reorder the section headings. The `visual-designer` agent parses `## Image Generation Briefs` by exact heading name, and the `copy-writer` agent appends to `## Copy Deck` by exact heading name.
+</Warning>
+
+## Quality gates
+
+- Minimum 3 concepts (unless you request fewer)
+- No two concepts share the same primary message angle
+- TikTok-targeted concepts must acknowledge vertical-only format and sound-on context
+- If you provided a specific offer, at least one concept leads with it
+- Every concept has at least one image brief per requested platform
+
+## Meta Andromeda note
+
+For Meta campaigns, `creative-strategist` deliberately generates concepts with different motivators, visual styles, and messaging angles. Meta's Andromeda engine clusters ads with more than 60% similarity and suppresses near-identical creatives — 100 minor variations perform no better than 10 genuinely distinct concepts.

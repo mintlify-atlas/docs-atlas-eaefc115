@@ -1,0 +1,215 @@
+---
+title: "TikTok Ads Deep Analysis with /ads tiktok"
+description: "Audit 28 TikTok Ads checks covering creative quality, Pixel tracking, Smart+ campaigns, GMV Max, Search Ads Toggle, and safe zone compliance."
+---
+
+The `/ads tiktok` command runs a full TikTok Ads audit centered on the platform's creative-first model. Unlike Google or Meta where targeting and bidding drive most of the performance differential, TikTok success depends primarily on creative quality—native-style content, fast hooks, sufficient creative volume, and sound-on design. The audit evaluates 28 checks across five weighted categories and produces a `TIKTOK-ADS-REPORT.md` with a health score, creative scorecard, Smart+ vs manual performance comparison, and TikTok Shop readiness assessment.
+
+## Scope
+
+`/ads tiktok` covers all major TikTok campaign types:
+
+- Standard In-Feed Ads (prospecting and retargeting)
+- Spark Ads (organic content whitelisted for paid promotion)
+- Smart+ campaigns (TikTok's automated campaign type)
+- GMV Max campaigns (mandatory for TikTok Shop Ads since July 2025)
+- Video Shopping Ads and LIVE Shopping Ads
+- Search Ads (via Search Ads Toggle)
+- Pangle network placements
+
+## Category breakdown and weights
+
+<Tabs>
+  <Tab title="Creative Quality — 30%">
+    **12 checks: T05–T10, T20–T25**
+
+    Creative is the #1 success factor on TikTok. The platform's algorithm uses creative signals for targeting in a similar way to Meta's Andromeda—content that performs well organically tends to perform well as an ad.
+
+    | Check | Description | Severity |
+    |-------|-------------|----------|
+    | T05 | ≥6 creative assets per ad group | **Critical** |
+    | T06 | All video assets 9:16 vertical (1080×1920) | **Critical** |
+    | T07 | Native-looking content, not corporate/polished | High |
+    | T08 | Hook in first 1–2 seconds | High |
+    | T09 | No creative active >7 days with declining CTR | High |
+    | T10 | Spark Ads tested (+142% engagement rate, +43% CVR vs standard In-Feed) | High |
+    | T20 | TikTok Shop catalog connected (e-commerce) | Medium |
+    | T21 | Video Shopping Ads tested for catalog accounts | Medium |
+    | T22 | Captions include high-intent keywords for search discovery | High |
+    | T23 | Trending or engaging audio used (sound-on platform) | Medium |
+    | T24 | Appropriate CTA button selected, not default | Medium |
+    | T25 | Key content within safe zone (X:40–940, Y:150–1470) | High |
+
+    **The creative-first rules:**
+    - Sound-on is non-negotiable: TikTok is consumed with sound 93% of the time. Silent video ads are a Quality Gate failure.
+    - Vertical-only: 9:16 is the only accepted format. Letterboxed horizontal content fails T06.
+    - ≥6 creatives per ad group: below this threshold, the algorithm cannot test effectively and the ad group cannot exit the learning phase on creative signals alone.
+    - Refresh every 7–10 days: TikTok's average creative lifespan is 7–10 days. High-spend accounts ($1K+/day) need fresh variations every 3–4 days.
+
+    <Warning>
+      Campaigns with 10+ unique creatives achieve 1.3× higher ad recall, 3.0× purchase intent, and 1.5× higher awareness compared to campaigns with fewer than 5 creatives.
+    </Warning>
+  </Tab>
+  <Tab title="Technical Setup — 25%">
+    **2 checks: T01–T02**
+
+    TikTok has a unique technical requirement: the `ttclid` (TikTok Click ID) must be captured, stored, and sent back with every conversion event. Without it, attribution breaks for a significant portion of conversions.
+
+    | Check | Description | Severity |
+    |-------|-------------|----------|
+    | T01 | TikTok Pixel installed and firing on all pages | **Critical** |
+    | T02 | Events API + ttclid passback active | High |
+
+    **ttclid requirements:**
+    1. Captured on first page load from the URL parameter
+    2. Stored in session storage or a cookie
+    3. Sent back with ALL conversion events via the Events API
+
+    Without ttclid passback, TikTok falls back to modeled attribution, which over-claims conversions and makes optimization decisions unreliable.
+
+    The Events API Gateway (v1.5 check T-EA1) simplifies server-side setup and recovers 13%+ of missed conversions compared to pixel-only tracking. SKAN 4 integration with coarse conversion values is required for iOS.
+  </Tab>
+  <Tab title="Bidding & Learning — 20%">
+    **3 checks: T11–T13**
+
+    TikTok's learning phase requires 50 conversions per 7 days per ad group to stabilize. Underfunded ad groups never exit learning and never optimize. Budget sufficiency is checked first because it gates everything else.
+
+    | Check | Description | Severity |
+    |-------|-------------|----------|
+    | T11 | Bid strategy matches goal (Lowest Cost for volume, Cost Cap for efficiency) | High |
+    | T12 | Daily budget ≥50× target CPA per ad group | High |
+    | T13 | Ad group achieving ≥50 conversions/week (learning phase exit criterion) | High |
+
+    **Budget sufficiency minimums:**
+
+    | Level | Minimum |
+    |-------|---------|
+    | Campaign | $50/day |
+    | Ad group | $20/day |
+    | Recommended | ≥50× target CPA/day per ad group |
+
+    **Learning phase rules:**
+    - Never make edits during active learning (resets the phase)
+    - Never increase budget by more than 20% at a time
+    - 3× Kill Rule: pause ad groups with CPA >3× target
+
+    For GMV Max campaigns (TikTok Shop): budget must be ≥50× target CPA. Total Shop performance is evaluated as GMV / (ad cost + affiliate commission), not just direct ROAS.
+  </Tab>
+  <Tab title="Structure & Settings — 15%">
+    **5 checks: T03–T04, T14–T16**
+
+    Campaign structure and the Search Ads Toggle have the largest structural impact on performance. Search Ads can add 20% more conversions when enabled alongside In-Feed campaigns.
+
+    | Check | Description | Severity |
+    |-------|-------------|----------|
+    | T03 | Separate campaigns for prospecting vs retargeting | High |
+    | T04 | Smart+ campaigns tested (42% adoption, 1.41–1.67 median ROAS) | Medium |
+    | T14 | Search Ads Toggle enabled (20% conversion uplift combined with In-Feed; 57% of TikTok users use search) | High |
+    | T15 | Placement selection reviewed (TikTok, Pangle, etc.) | Medium |
+    | T16 | Dayparting aligned with target audience activity | Low |
+
+    **Search Ads Toggle**: 57% of TikTok users actively search the platform. Enabling Search Ads alongside In-Feed campaigns means 18% of users who didn't convert via In-Feed will convert via Search Ads—representing a clean incremental conversion layer. Supports up to 1,000 keywords per ad group with exact, phrase, and broad match types plus negative keywords and search term reports.
+
+    **Smart+ modular control (2025)**: Advertisers can now lock specific modules—targeting, creative, budget, or placement—while automating others. This addresses the previous all-or-nothing limitation. Supports up to 30 ad groups per campaign, 30 asset groups per ad group, and 50 creatives per asset group.
+  </Tab>
+  <Tab title="Performance — 10%">
+    **3 checks: T17–T19**
+
+    Performance benchmarks are checked last because they are lagging indicators of creative quality and technical setup issues caught in earlier categories.
+
+    | Check | Pass | Warning | Fail |
+    |-------|------|---------|------|
+    | T17: CTR (in-feed) | ≥1.0% | 0.5–1.0% | &lt;0.5% |
+    | T18: CPA vs target | Within target | 1.5–3× target | >3× target (3× Kill Rule) |
+    | T19: Video watch time (avg) | ≥6 seconds | 3–6 seconds | &lt;3 seconds |
+  </Tab>
+</Tabs>
+
+## TikTok safe zone
+
+All critical text, logos, and CTAs must be within the safe zone:
+
+```
+┌──────────────────────────────┐
+│  0–150px: Status bar          │  ← TOP UNSAFE
+├──────────────────────────────┤
+│                         │    │
+│    SAFE ZONE            │140 │  ← RIGHT: Like, comment,
+│    X: 40–940px          │ px │     share, profile icons
+│    Y: 150–1470px        │    │
+│    (900×1320px)         │    │
+│                         │    │
+├──────────────────────────────┤
+│  Caption, music, CTA, nav    │  ← BOTTOM UNSAFE
+└──────────────────────────────┘
+```
+
+Content placed in the top 150px, right 140px, or bottom 450px will be covered by TikTok's native UI elements. Safe zone compliance (T25) is a High severity check.
+
+## Spark Ads assessment
+
+Spark Ads whitelist organic TikTok posts for use as paid ads, preserving all organic engagement and comments. The audit evaluates:
+
+- Are Spark Ads being used at all? (If not, High priority recommendation)
+- What is the CTR of Spark Ads vs standard In-Feed Ads?
+- Are winning organic posts being identified and converted to Spark Ads at scale?
+
+Spark Ads benchmarks vs standard In-Feed:
+- +30% completion rate
+- +142% engagement rate
+- +43% CVR
+- −4% CPM
+- Profile landing page variant: 69% higher CVR, 37% lower CPA
+
+## Quality rules enforced
+
+<CardGroup cols={2}>
+  <Card title="Budget sufficiency" icon="dollar-sign">
+    Daily budget ≥50× target CPA per ad group. Ad groups below this threshold cannot exit the learning phase. This is evaluated before any other optimization recommendation.
+  </Card>
+  <Card title="Sound-on required" icon="volume-high">
+    Silent video ads violate TikTok's core platform behavior. Any creative running without audio is flagged as a Quality Gate failure. Trending or engaging audio is a Medium severity check (T23); the absence of any audio is treated as a creative failure.
+  </Card>
+</CardGroup>
+
+## GMV Max and TikTok Shop
+
+GMV Max became mandatory for all TikTok Shop campaigns in July 2025. The audit evaluates:
+
+- All Shop Ads campaigns using GMV Max (v1.5 check T-GM1; non-compliance is Critical)
+- Product feed quality and completeness
+- Video Shopping Ads, LIVE Shopping Ads, and Product Shopping Ads present
+- Shop CVR benchmark: >10% (vs 0.46–2.4% for standard landing pages)
+- Affiliate program configured
+
+## Key thresholds
+
+| Metric | Pass | Warning | Fail |
+|--------|------|---------|------|
+| CTR (in-feed) | ≥1.0% | 0.5–1.0% | &lt;0.5% |
+| Creatives per ad group | ≥6 | 3–5 | &lt;3 |
+| Video watch time | ≥6s | 3–6s | &lt;3s |
+| Learning conversions/week | ≥50 | 30–50 | &lt;30 |
+| Daily budget | ≥50× CPA | 20–49× CPA | &lt;20× CPA |
+| Creative age (declining CTR) | &lt;7 days | 7–14 days | >14 days |
+
+## Quick wins
+
+| Check | Fix | Time |
+|-------|-----|------|
+| T14: Search Ads Toggle | Enable Search Ads Toggle in campaign settings | 2 min |
+| T06: Vertical video | Convert existing assets to 9:16 format | 10 min |
+| T24: CTA button | Select appropriate CTA (not default) | 2 min |
+| T10: Spark Ads | Whitelist top creator/organic content as Spark Ads | 10 min |
+| T22: Caption SEO | Add high-intent keywords to ad captions | 5 min |
+| T25: Safe zone | Verify key content within X:40–940, Y:150–1470 | 5 min |
+
+## Output
+
+Running `/ads tiktok` produces:
+
+- **`TIKTOK-ADS-REPORT.md`**: Full 28-check findings with per-category scores and pass/warning/fail table
+- **Creative scorecard per ad**: Hook quality, safe zone compliance, native feel, Spark Ads status
+- **Smart+ vs manual comparison**: Performance data side-by-side for accounts testing both
+- **TikTok Shop readiness assessment**: Product feed quality, GMV Max compliance, Shop CVR vs benchmark
+- **Quick Wins**: Sorted by severity × estimated impact

@@ -1,81 +1,121 @@
 ---
-title: "Quickstart"
-description: "Start building awesome documentation in minutes"
-icon: 'rocket'
+title: "Quickstart: Run Your First Ad Audit"
+description: "Export your ad data, give Claude Ads your industry and budget context, and get a scored audit with a prioritized action plan in minutes."
 ---
 
-## Get started in three steps
+Running your first audit takes three things: Claude Code with Claude Ads installed, a data export from your ad platform, and a one-line command. Claude Ads handles the rest — asking for context, analyzing your data, and producing scored output files you can act on immediately.
 
-Get your documentation site running locally and make your first customization.
+## Run your first audit
 
-### Step 1: Set up your local environment
+<Steps>
+  <Step title="Start Claude Code">
+    Open your terminal and launch Claude Code:
 
-<AccordionGroup>
-  <Accordion icon="copy" title="Clone your docs locally">
-    During the onboarding process, you created a GitHub repository with your docs content if you didn't already have one. You can find a link to this repository in your [dashboard](https://dashboard.mintlify.com).
-    
-    To clone the repository locally so that you can make and preview changes to your docs, follow the [Cloning a repository](https://docs.github.com/en/repositories/creating-and-managing-repositories/cloning-a-repository) guide in the GitHub docs.
-  </Accordion>
-  <Accordion icon="rectangle-terminal" title="Start the preview server">
-    1. Install the Mintlify CLI: `npm i -g mint`
-    2. Navigate to your docs directory and run: `mint dev`
-    3. Open `http://localhost:3000` to see your docs live!
-    
-    <Tip>Your preview updates automatically as you edit files.</Tip>
-  </Accordion>
-</AccordionGroup>
+    ```bash
+    claude
+    ```
+  </Step>
 
-### Step 2: Deploy your changes
+  <Step title="Export your ad account data">
+    Download a report from your ad platform dashboard covering the **last 30 days**. Claude Ads works with CSV exports, screenshots, or metrics pasted directly into the chat. You do not need API credentials.
 
-<AccordionGroup>
-  <Accordion icon="github" title="Install our GitHub app">
-    Install the Mintlify GitHub app from your [dashboard](https://dashboard.mintlify.com/settings/organization/github-app).
-    
-    Our GitHub app automatically deploys your changes to your docs site, so you don't need to manage deployments yourself.
-</Accordion>
-<Accordion icon="palette" title="Update your site name and colors">
-    For a first change, let's update the name and colors of your docs site.
+    Recommended exports by platform:
 
-    1. Open `docs.json` in your editor.
-    2. Change the `"name"` field to your project name.
-    3. Update the `"colors"` to match your brand.
-    4. Save and see your changes instantly at `http://localhost:3000`.
+    | Platform | What to export |
+    |----------|---------------|
+    | Google Ads | Campaign performance report (CSV) |
+    | Meta Ads | Campaign, ad set, and ad-level breakdown (CSV) |
+    | LinkedIn Ads | Campaign performance export |
+    | TikTok Ads | Campaign report |
+    | Microsoft Ads | Campaign performance report |
+    | Apple Ads | Campaign dashboard screenshot or CSV |
+  </Step>
 
-    <Tip>Try changing the primary color to see an immediate difference!</Tip>
-  </Accordion>
-</AccordionGroup>
+  <Step title="Provide your context upfront">
+    Before every audit, Claude Ads collects four pieces of context. You can answer the intake questions when prompted, or provide this information in your opening message to get better results immediately:
 
-### Step 3: Go live
+    1. **Industry / business type** — SaaS, ecommerce, local service, B2B enterprise, info products, mobile app, real estate, healthcare, finance, or agency
+    2. **Monthly ad spend** — total and per-platform breakdown (approximate is fine)
+    3. **Primary goal** — sales/revenue, leads/demos, app installs, calls, or brand
+    4. **Active platforms** — which platforms you are advertising on
 
-<Accordion icon="rocket" title="Publish your docs">
-  1. Commit and push your changes.
-  2. Your docs will update and be live in moments!
-</Accordion>
+    <Tip>
+      Providing context upfront produces better recommendations. A message like "I spend $5k/mo on Google Ads for a SaaS company, primary goal is demo requests" lets Claude Ads apply the right industry benchmarks and budget-appropriate checks without asking follow-up questions.
+    </Tip>
+  </Step>
+
+  <Step title="Run an audit command">
+    Choose the command that matches your situation:
+
+    <CodeGroup>
+
+    ```shell Full multi-platform audit
+    /ads audit
+    ```
+
+    ```shell Google Ads only
+    /ads google
+    ```
+
+    ```shell Meta Ads only
+    /ads meta
+    ```
+
+    ```shell Strategic plan for SaaS
+    /ads plan saas
+    ```
+
+    </CodeGroup>
+
+    Paste or attach your exported data when Claude Ads prompts for it.
+  </Step>
+</Steps>
+
+## Common first commands
+
+| Command | What it does |
+|---------|--------------|
+| `/ads audit` | Full multi-platform audit — spawns 6 parallel agents for budget, compliance, creative, tracking, Google, and Meta simultaneously |
+| `/ads google` | Google Ads deep analysis across Search, PMax, AI Max, Demand Gen, CTV, and YouTube (80 checks) |
+| `/ads meta` | Meta Ads deep analysis for Facebook, Instagram, and Advantage+ Shopping (50 checks) |
+| `/ads plan saas` | Strategic ad plan using the SaaS industry template — trial/demo focus, Google + LinkedIn platform mix, KPI targets |
+
+For a full list of commands, see [Full audit reference](/commands/full-audit).
+
+## What the output looks like
+
+After analysis, Claude Ads produces three output files in your working directory:
+
+| File | Contents |
+|------|----------|
+| `ADS-AUDIT-REPORT.md` | Per-platform scores, finding details, and severity breakdown |
+| `ADS-ACTION-PLAN.md` | Prioritized list of fixes organized by critical, high, medium, and low severity |
+| `ADS-QUICK-WINS.md` | Top changes estimated to have the fastest impact relative to effort |
+
+For full audits (`/ads audit`), the report also includes an aggregate **Ads Health Score (0–100)** weighted by each platform's share of your total spend.
+
+## Grading scale
+
+| Grade | Score | What it means |
+|-------|-------|---------------|
+| A | 90–100 | Minor optimizations only — accounts in strong shape |
+| B | 75–89 | Some improvement opportunities — good baseline, fixable gaps |
+| C | 60–74 | Notable issues need attention — performance drag present |
+| D | 40–59 | Significant problems — prioritize fixes before scaling |
+| F | &lt;40 | Urgent intervention required — structural issues likely costing budget |
+
+## Tips for better results
+
+<Tip>
+  Always include your industry and monthly budget when running any audit. Benchmarks and best practices differ significantly between a $500/month account and a $50,000/month account. Telling Claude Ads "I spend $2k/month on Google Ads for a local plumbing business" produces far more relevant recommendations than running `/ads google` without context.
+</Tip>
+
+<Note>
+  Claude Ads auto-detects your business type from ad account signals (conversion events, platform mix, targeting patterns, product feeds), but providing it explicitly is faster and more reliable.
+</Note>
 
 ## Next steps
 
-Now that you have your docs running, explore these key features:
-
-<CardGroup cols={2}>
-
-<Card title="Write Content" icon="pen-to-square" href="/essentials/markdown">
-  Learn MDX syntax and start writing your documentation.
-</Card>
-
-<Card title="Customize style" icon="palette" href="/essentials/settings">
-  Make your docs match your brand perfectly.
-</Card>
-
-<Card title="Add code examples" icon="square-code" href="/essentials/code">
-  Include syntax-highlighted code blocks.
-</Card>
-
-<Card title="API documentation" icon="code" href="/api-reference/introduction">
-  Auto-generate API docs from OpenAPI specs.
-</Card>
-
-</CardGroup>
-
-<Note>
-  **Need help?** See our [full documentation](https://mintlify.com/docs) or join our [community](https://mintlify.com/community).
-</Note>
+- **Full audit details** — see [Full multi-platform audit](/commands/full-audit) for how the 6 parallel agents work and what each one checks.
+- **Platform-specific audits** — jump to [Google](/commands/google), [Meta](/commands/meta), [LinkedIn](/commands/linkedin), [TikTok](/commands/tiktok), [Microsoft](/commands/microsoft), or [Apple](/commands/apple) for platform-specific command details.
+- **Strategic planning** — use `/ads plan <type>` with one of the 12 supported business types to get a full platform mix, campaign architecture, and KPI framework.

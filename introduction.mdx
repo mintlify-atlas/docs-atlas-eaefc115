@@ -1,0 +1,95 @@
+---
+title: "What is Claude Ads?"
+description: "Claude Ads is a Claude Code skill that audits paid ads locally—no API login, no cloud transfer, no auto-posting. Just structured analysis you control."
+---
+
+Claude Ads is a **Claude Code skill**, not a SaaS product or browser extension. You install it once into Claude Code, point it at ad data you export from your platform dashboards, and it returns a structured **Ads Health Score (0–100)** with a prioritized action plan. Everything runs on your local machine. No ad platform credentials are stored, and no data leaves your environment.
+
+## How it works
+
+Claude Ads follows a read-analyze-report loop:
+
+1. You export account data (CSV reports, screenshots, or pasted metrics) from your ad platform.
+2. You run a command in Claude Code — `/ads audit`, `/ads google`, or any platform-specific command.
+3. Claude Ads analyzes the data against 250+ weighted checks and industry benchmarks.
+4. It returns per-platform scores, a prioritized finding list, and output files you can act on immediately.
+
+There is no automatic login to any ad manager. There is no background sync. There is no data sent to external servers. Analysis is entirely local.
+
+## The 3-layer architecture
+
+Claude Ads is built on a three-layer model that keeps each layer focused and composable:
+
+<Steps>
+  <Step title="Orchestrator skill">
+    The `ads` skill (`~/.claude/skills/ads/SKILL.md`) is the entry point. It handles context intake, routes commands to the right sub-skill, and aggregates results into a unified report. It also loads 25 reference files on demand using a RAG pattern — only what is needed for each analysis.
+  </Step>
+  <Step title="Sub-skills">
+    19 specialized sub-skills handle deep single-domain analysis: `ads-google`, `ads-meta`, `ads-youtube`, `ads-linkedin`, `ads-tiktok`, `ads-microsoft`, `ads-apple`, `ads-creative`, `ads-landing`, `ads-budget`, `ads-plan`, `ads-competitor`, `ads-math`, `ads-test`, `ads-report`, `ads-dna`, `ads-create`, `ads-generate`, and `ads-photoshoot`. Each sub-skill has its own `SKILL.md` with platform-specific audit logic.
+  </Step>
+  <Step title="Agents and references">
+    10 agents run in parallel during full audits — 6 audit agents (`audit-google`, `audit-meta`, `audit-creative`, `audit-tracking`, `audit-budget`, `audit-compliance`) and 4 creative agents. References are 25 on-demand knowledge files covering benchmarks, bidding decision trees, compliance requirements, platform specs, and more.
+  </Step>
+</Steps>
+
+## Key differentiators
+
+<Columns cols={2}>
+  <Card title="250+ weighted checks" icon="list-check">
+    Every finding carries a severity weight. Critical issues (revenue or data loss risk) surface before medium or low-priority optimizations.
+  </Card>
+  <Card title="Parallel analysis" icon="bolt-lightning">
+    Full audits spawn 6 subagents simultaneously. Budget, compliance, creative quality, conversion tracking, Google, and Meta all run at the same time — not in sequence.
+  </Card>
+  <Card title="Weighted scoring" icon="chart-bar">
+    The Ads Health Score aggregates per-platform scores weighted by budget share. A platform consuming 70% of your spend influences the aggregate score more than one consuming 5%.
+  </Card>
+  <Card title="Privacy-first" icon="lock">
+    No API credentials are required by default. Data flows only between your machine and the ad platform when you use optional MCP servers for live access. All analysis happens locally.
+  </Card>
+</Columns>
+
+## What Claude Ads does not do
+
+<Warning>
+  Claude Ads is an audit and strategy tool. It does not log in to any ad platform automatically, it does not create or post ads, and it does not send your account data to any cloud service. All recommendations require you to act manually inside your ad platform.
+</Warning>
+
+- **No automatic API login.** Claude Ads works with data you provide. Optional MCP server integration exists for live Google Ads GAQL queries, but credentials stay on your machine.
+- **No auto-posting or campaign creation.** Finding issues and recommending fixes is what Claude Ads does. Implementing those fixes is always a manual step in your ad platform.
+- **No cloud data transfer.** The skill runs inside Claude Code on your local machine. Exports, screenshots, and pasted metrics never leave your environment.
+
+## Supported platforms
+
+<Columns cols={2}>
+  <Card title="Google Ads" icon="google" href="/commands/google">
+    Search, PMax, AI Max, Demand Gen, CTV, YouTube — **80 checks**
+  </Card>
+  <Card title="Meta Ads" icon="meta" href="/commands/meta">
+    Facebook, Instagram, Advantage+ Shopping, Andromeda creative diversity — **50 checks**
+  </Card>
+  <Card title="Apple Ads" icon="apple" href="/commands/apple">
+    Campaign structure, CPPs, Maximize Conversions, AdAttributionKit — **35+ checks**
+  </Card>
+  <Card title="TikTok Ads" icon="tiktok" href="/commands/tiktok">
+    Creative-first, Smart+, GMV Max, Search Ads, Events API — **28 checks**
+  </Card>
+  <Card title="LinkedIn Ads" icon="linkedin" href="/commands/linkedin">
+    B2B targeting, Thought Leader Ads, Lead Gen, CRM integration — **27 checks**
+  </Card>
+  <Card title="Microsoft Ads" icon="microsoft" href="/commands/microsoft">
+    Google import safety, Copilot placements, CTV, LinkedIn targeting — **24 checks**
+  </Card>
+  <Card title="YouTube Ads" icon="youtube" href="/commands/youtube">
+    Skippable, Bumper, Shorts, Demand Gen — analyzed as part of Google or standalone
+  </Card>
+  <Card title="Cross-platform" icon="arrows-left-right">
+    Privacy infrastructure, creative diversity, refresh cadence — **3 checks** applied across all active platforms
+  </Card>
+</Columns>
+
+<Note>
+  Reddit, Pinterest, Snapchat, and CTV/OTT platforms are covered in the reference guide for strategic planning context, but do not have dedicated platform audit sub-skills.
+</Note>
+
+Ready to install? See [Installation](/installation) for all methods including the plugin marketplace, one-line installer, and manual clone.

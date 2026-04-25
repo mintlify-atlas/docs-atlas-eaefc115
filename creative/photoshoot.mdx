@@ -1,0 +1,163 @@
+---
+title: "AI Product Photography in 5 Styles"
+description: "Run /ads photoshoot to generate product photography in Studio, Floating, Ingredient, In Use, and Lifestyle styles at 2K resolution for Meta and TikTok."
+---
+
+`/ads photoshoot` generates professional, ad-ready product photography in 5 distinct visual styles. Each style outputs two sizes — 1:1 (1080×1080) for Meta Feed and LinkedIn, and 9:16 (1080×1920) for TikTok, Reels, and Stories — at 2K resolution. The command can run completely standalone or read `brand-profile.json` to inject your brand colors, mood, and target audience context into the prompts.
+
+## Usage
+
+```bash
+/ads photoshoot
+```
+
+```bash
+# Generate specific styles only
+/ads photoshoot --styles studio floating
+
+# Start with a product image file
+/ads photoshoot --product ./shoe.jpg
+
+# Generate all 5 sizes per style across platforms
+/ads photoshoot --all-platforms
+```
+
+## Environment setup
+
+`/ads photoshoot` uses the same provider setup as `/ads generate`. Configure your API key before running:
+
+```bash
+# Default: Gemini via banana-claude
+export GOOGLE_API_KEY=your_key_here
+
+# Alternative providers
+export ADS_IMAGE_PROVIDER=openai   # + OPENAI_API_KEY
+export ADS_IMAGE_PROVIDER=stability  # + STABILITY_API_KEY
+export ADS_IMAGE_PROVIDER=replicate  # + REPLICATE_API_TOKEN
+```
+
+Run `/banana setup` to verify banana-claude is installed. If it is not, the command displays setup instructions and exits.
+
+## How it works
+
+When you run `/ads photoshoot`, Claude asks four questions in a single message:
+
+1. **Product**: path to a local image file, a URL, or a text description
+2. **Product description**: key features and details to highlight (improves prompt quality)
+3. **Styles to generate**: which of the 5 styles you want (default: all 5)
+4. **Target platforms**: determines output sizes (default: Meta + TikTok → 1:1 + 9:16)
+
+If `brand-profile.json` exists in the current directory, the following fields are automatically extracted and injected into prompts:
+
+- `colors.primary` → backgrounds and accent elements
+- `aesthetic.mood_keywords` → atmosphere descriptors
+- `target_audience` → context for Lifestyle and In Use styles
+- `imagery.forbidden` → excluded from all prompts
+
+## The 5 photography styles
+
+<CardGroup cols={2}>
+  <Card title="Studio" icon="circle-dot">
+    Clean, e-commerce style product shot on a white or neutral seamless background with even studio lighting and a soft drop shadow. Product is centered with slight 3/4 angle or flat lay. Universal and platform-safe — works on every platform.
+
+    **Best for:** Meta Feed, LinkedIn, Google PMax
+
+    **banana domain mode:** Product
+  </Card>
+  <Card title="Floating" icon="wind">
+    Product suspended in mid-air with a dramatic levitation effect. Atmospheric shadow beneath, gradient background in brand primary color or mood keyword. High visual impact — designed to stop the scroll on vertical placements.
+
+    **Best for:** Meta Reels, TikTok, Stories
+
+    **banana domain mode:** Product
+  </Card>
+  <Card title="Ingredient" icon="layers">
+    Top-down overhead flat lay with the product centered and surrounded by its key ingredients or component materials, artfully arranged with intentional negative space. Works best as square — tells the product origin story without words.
+
+    **Best for:** Meta Feed, Pinterest
+
+    **banana domain mode:** Product
+  </Card>
+  <Card title="In Use" icon="hand">
+    Hands interacting with the product in natural context. Shallow depth of field, warm natural window light, authentic not staged. Hands only — no full face — to avoid model release complications. Audience profession is implied through the surrounding context.
+
+    **Best for:** TikTok, Meta Reels, Stories
+
+    **banana domain mode:** Editorial
+  </Card>
+</CardGroup>
+
+<Card title="Lifestyle" icon="sun">
+  Aspirational full-context scene. The product appears as the hero element within a real-world environment appropriate for your target audience's age range and profession. Golden hour or clean natural lighting. Broadest audience appeal across all platforms.
+
+  **Best for:** All platforms
+
+  **banana domain mode:** Editorial
+</Card>
+
+## Output
+
+Each style generates two sizes. All output is saved to `./product-photos/`:
+
+```
+./product-photos/
+  studio/
+    product-studio-1080x1080.png
+    product-studio-1080x1920.png
+  floating/
+    product-floating-1080x1080.png
+    product-floating-1080x1920.png
+  ingredient/
+    product-ingredient-1080x1080.png
+    product-ingredient-1080x1920.png
+  in-use/
+    product-in-use-1080x1080.png
+    product-in-use-1080x1920.png
+  lifestyle/
+    product-lifestyle-1080x1080.png
+    product-lifestyle-1080x1920.png
+```
+
+All 5 styles × 2 sizes = **10 images**. With all-platforms mode (`--all-platforms`), additional sizes are generated per style.
+
+## Platform recommendations
+
+| Style | Recommended placements | Rationale |
+|-------|----------------------|-----------|
+| Studio | Meta Feed (4:5), LinkedIn (1:1), Google PMax (1:1) | Universal, clean, platform-safe |
+| Floating | Meta Reels (9:16), TikTok (9:16), Stories (9:16) | High visual impact on vertical placements |
+| Ingredient | Meta Feed (1:1), Pinterest | Works best as square; tells product story |
+| In Use | TikTok (9:16), Meta Reels (9:16), Stories (9:16) | Authentic, native-feeling content |
+| Lifestyle | All platforms | Aspirational, broad audience appeal |
+
+<Tip>
+  For Google PMax, generate Studio (1:1) and then crop to 1.91:1 (1200×628) in your preferred image editor. Google PMax requires both the landscape and square formats for full placement coverage.
+</Tip>
+
+## Cost and confirmation
+
+Before generating, the command calculates: styles selected × 2 sizes = total images, then shows the estimated cost. If the total exceeds $0.50, it asks for confirmation before proceeding.
+
+At 2K resolution (recommended for ad quality), each image costs $0.078 via Gemini. Five styles × 2 sizes = 10 images ≈ $0.78.
+
+## Iterative refinement
+
+If the initial generation does not match your expectations, you can refine by specifying:
+
+- **Lighting direction**: "rim lighting from the left", "overhead diffused"
+- **Color temperature**: "warm golden", "cool daylight"
+- **Background texture**: "linen fabric surface", "marble countertop"
+- **Product angle**: "front-facing straight on", "45-degree elevated"
+
+Claude will regenerate the selected styles with the adjusted parameters.
+
+## Next steps
+
+After generating product photos, use them in a full campaign:
+
+```bash
+# Use photoshoot output in a campaign
+/ads generate
+```
+
+Or upload directly to your ad platform managers. Studio and Lifestyle styles are ready to use as-is for most platforms. For TikTok and Reels placements, verify that key elements fall within the safe zone: X:40–940px, Y:150–1470px.

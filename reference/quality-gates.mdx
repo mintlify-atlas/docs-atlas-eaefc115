@@ -1,0 +1,111 @@
+---
+title: "Quality Gates: Hard Rules in Every Audit"
+description: "Ten non-negotiable rules Claude Ads enforces on every audit regardless of account size, budget, or platform — and why each one exists."
+---
+
+Quality gates are hard rules that Claude Ads never violates regardless of context. Unlike scored checks — which produce a weighted severity rating and appear in the prioritized action plan — quality gates trigger an immediate flag or recommendation the moment a violation is detected. They represent the floor below which no account should operate, based on platform mechanics, financial logic, and legal requirements.
+
+## The 10 quality gates
+
+<AccordionGroup>
+  <Accordion title="1. Never recommend Broad Match without Smart Bidding (Google)">
+    **Rule:** Broad Match keywords are only recommended when Smart Bidding (Target CPA, Target ROAS, or Maximize Conversions) is active on the same campaign.
+
+    **Why it exists:** Broad Match expands query matching aggressively. Without a Smart Bidding strategy feeding signals back to Google's algorithm, that expansion has no optimization mechanism — it simply burns budget on irrelevant searches. The combination of Broad Match with Smart Bidding is intentional and supported; Broad Match without it is a budget leak.
+
+    **When triggered:** Any recommendation to add Broad Match keywords in an account where Smart Bidding is not active, or any account already running Broad Match without Smart Bidding.
+  </Accordion>
+
+  <Accordion title="2. 3x Kill Rule: flag CPA >3x target for immediate pause">
+    **Rule:** Any ad group or campaign with a cost-per-acquisition exceeding three times the target CPA for 7 or more days must be flagged for immediate pause.
+
+    **Why it exists:** Letting a campaign run at 3x CPA is a structural problem, not a fluctuation. At that level, the algorithm is not learning — it is confirming a broken setup. Pausing and diagnosing is faster and cheaper than waiting for mean reversion that may not come. This rule also applies at the creative level: no conversions after $100 spend or 50 clicks → pause and diagnose.
+
+    **When triggered:** Severity Critical flag on the campaign or ad group with a pause recommendation and a required diagnostic checklist.
+  </Accordion>
+
+  <Accordion title="3. Budget sufficiency: Meta ≥5x CPA per ad set, TikTok ≥50x CPA per ad group">
+    **Rule:** Meta ad sets must have a daily budget of at least 5× the target CPA. TikTok ad groups must have a daily budget of at least 50× the target CPA.
+
+    **Why it exists:** Both platforms require a minimum conversion volume to exit the learning phase. Meta needs approximately 50 conversions per week per ad set; TikTok needs approximately 50 conversions per week per ad group. Underfunded ad sets never exit learning, never optimize, and report inflated CPAs that look like performance problems rather than budget problems.
+
+    **When triggered:** A Warning or Fail on the budget sufficiency check, with a specific budget increase recommendation calculated from the account's actual CPA data.
+  </Accordion>
+
+  <Accordion title="4. Learning phase protection: no edits during active learning">
+    **Rule:** Claude Ads will never recommend edits to a campaign, ad set, or ad group that is currently in an active learning phase.
+
+    **Why it exists:** Editing a campaign during learning resets the learning counter. On Meta, this means restarting the 50-conversion accumulation. On Google, it disrupts Smart Bidding's model. The result is a perpetually-learning account that never stabilizes — a common cause of accounts that seem to underperform despite repeated optimization attempts.
+
+    **When triggered:** Any recommendation that would modify a learning-phase entity is held until the learning phase completes, with a note explaining the wait.
+  </Accordion>
+
+  <Accordion title="5. Compliance: always check Special Ad Categories">
+    **Rule:** Every audit checks whether housing, employment, credit, and financial products campaigns have declared the correct Special Ad Category on Meta and equivalent restricted settings on Google.
+
+    **Why it exists:** Running housing or credit ads without declaring the Special Ad Category violates platform policy and fair lending law. Meta enforces this at the account level — violations can result in account restriction or suspension. The targeting restrictions that come with Special Ad Categories (no age, gender, ZIP code; minimum 15-mile radius; no Lookalike Audiences) are legally required, not optional optimizations.
+
+    **When triggered:** A Critical flag on any campaign in a restricted category that has not declared its Special Ad Category, with specific instructions to declare before the campaign can be safely run.
+  </Accordion>
+
+  <Accordion title="6. Creative: never run silent video ads on TikTok">
+    **Rule:** Video ads running on TikTok must include audio. Silent video ads are never recommended for TikTok placement.
+
+    **Why it exists:** TikTok is a sound-on platform by default. The algorithm favors content that uses audio — whether music, voiceover, or ambient sound. Silent ads underperform not just because users expect sound, but because TikTok's ranking system treats audio engagement (completion with sound on) as a quality signal. Music and voiceover increase conversions by 20%+ on TikTok.
+
+    **When triggered:** Any TikTok creative review that identifies silent video assets, flagged as a High severity finding with a creative revision requirement.
+  </Accordion>
+
+  <Accordion title="7. Attribution defaults: 7-day click / 1-day view (Meta), data-driven (Google)">
+    **Rule:** Meta attribution windows default to 7-day click / 1-day view. Google attribution defaults to Data-Driven Attribution (DDA). Deviations from these defaults require explicit justification.
+
+    **Why it exists:** These are the attribution windows that most accurately reflect actual purchase behavior for the majority of advertisers. Shorter windows undercount conversions. Rule-based attribution models (first click, linear, time decay, position-based) were all removed by Google in 2024 — all accounts were auto-upgraded to DDA. Any client report still referencing legacy models is out of date and should be corrected.
+
+    **When triggered:** A flag on any Meta account using a non-standard attribution window, or any Google account report referencing deprecated attribution models.
+  </Accordion>
+
+  <Accordion title="8. Andromeda creative diversity: flag Meta accounts with &lt;10 distinct creatives">
+    **Rule:** Meta accounts with fewer than 10 genuinely distinct creative concepts are flagged as a High severity finding.
+
+    **Why it exists:** Meta's Andromeda algorithm uses creative signals as the primary targeting lever — the algorithm finds audiences based on who responds to a specific creative, not just declared interests. Creative Similarity Scores above 60% trigger retrieval suppression (an Andromeda penalty). Accounts with fewer than 10 genuinely distinct creatives lack the diversity needed for the algorithm to find multiple audience segments. The benchmark: 25 diverse creatives produce 17% more conversions at 16% lower cost.
+
+    **When triggered:** A High severity flag on Meta creative diversity, with specific instructions on the minimum creative volume needed and what "genuinely distinct" means (different hooks, formats, and messaging angles — not just color or copy swaps).
+  </Accordion>
+
+  <Accordion title="9. Privacy infrastructure gate: verify full tracking stack before optimization">
+    **Rule:** Before making any optimization recommendations, Claude Ads verifies that the privacy infrastructure is complete: Consent Mode V2 (Google and Microsoft), CAPI (Meta), Events API (TikTok), and AdAttributionKit (Apple).
+
+    **Why it exists:** This is the cross-platform X-PI1 check — rated Critical. Without a complete privacy infrastructure, conversion signals are degraded or missing, which means every optimization recommendation downstream is built on incomplete data. Consent Mode V2 without Advanced mode loses 90–95% of EU conversions. CAPI without server-side implementation loses a significant share of iOS conversions. Recommending bid strategy changes on broken tracking is actively harmful.
+
+    **When triggered:** A Critical flag before any optimization output, with a mandatory tracking remediation checklist that must be addressed first.
+  </Accordion>
+
+  <Accordion title="10. PDF report quality gate: check before output">
+    **Rule:** When generating reports via `/ads report`, the `generate_report.py` script must be run with `--check` before `--output`. Reports must have clean layout, proper margins (0.75 in), word-wrapped table cells, all charts sized within page boundaries, page numbers, section dividers, captions on every visual, and zero empty sections.
+
+    **Why it exists:** A PDF delivered to a client with overlapping elements, clipped tables, or missing sections reflects directly on the quality of the audit. The `--check` flag catches layout issues before the final render. Skipping the check step risks delivering a broken report.
+
+    **When triggered:** The `--check` run must complete with zero warnings before `--output` is invoked. Any warnings from `--check` must be resolved first.
+  </Accordion>
+</AccordionGroup>
+
+## What happens when a gate is triggered
+
+<Steps>
+  <Step title="Immediate severity flag">
+    The gate violation is flagged at its designated severity level (Critical or High) before any platform-specific scored findings are listed.
+  </Step>
+  <Step title="Explanation and rationale">
+    Claude Ads explains why the gate exists and what the likely impact of the violation is — revenue loss, data loss, policy risk, or legal exposure.
+  </Step>
+  <Step title="Specific remediation steps">
+    A concrete, ordered checklist of actions to resolve the gate violation. For compliance gates, this includes the exact platform setting to change. For tracking gates, this includes which implementation to verify first.
+  </Step>
+  <Step title="Hold on dependent recommendations">
+    If the gate violation invalidates downstream recommendations (such as the privacy infrastructure gate blocking optimization advice), those recommendations are withheld until the gate is resolved.
+  </Step>
+</Steps>
+
+<Warning>
+  Quality gates are not suggestions. They represent the minimum conditions for a safely-run ad account. An account that passes all scored checks but violates a quality gate should be treated as having a Critical finding.
+</Warning>

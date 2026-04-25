@@ -1,0 +1,103 @@
+{
+  "projectType": "general",
+  "projectName": "Claude Ads",
+  "projectDescription": "A Claude Code skill for comprehensive paid advertising audits and optimization across Google, Meta, YouTube, LinkedIn, TikTok, Microsoft, and Apple Ads with 250+ weighted checks, parallel agents, industry templates, and AI creative generation.",
+  "theme": "almond",
+  "primaryColor": "#e47c54",
+  "lightColor": "#0c0c0c",
+  "darkColor": "#f46404",
+  "navigation": {
+    "tabs": [
+      {
+        "tab": "Documentation",
+        "groups": [
+          {
+            "group": "Get Started",
+            "pages": [
+              "introduction",
+              "installation",
+              "quickstart"
+            ]
+          },
+          {
+            "group": "Audit Commands",
+            "pages": [
+              "commands/full-audit",
+              "commands/google",
+              "commands/meta",
+              "commands/youtube",
+              "commands/linkedin",
+              "commands/tiktok",
+              "commands/microsoft",
+              "commands/apple"
+            ]
+          },
+          {
+            "group": "Strategy & Planning",
+            "pages": [
+              "commands/plan",
+              "commands/budget",
+              "commands/competitor",
+              "commands/math",
+              "commands/test"
+            ]
+          },
+          {
+            "group": "Creative Workflow",
+            "pages": [
+              "creative/overview",
+              "creative/dna",
+              "creative/create",
+              "creative/generate",
+              "creative/photoshoot"
+            ]
+          },
+          {
+            "group": "Reference",
+            "pages": [
+              "reference/scoring",
+              "reference/industry-templates",
+              "reference/quality-gates",
+              "reference/mcp-integration",
+              "reference/faq"
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "keyFeatures": [
+    "250+ audit checks across 7 ad platforms (Google, Meta, YouTube, LinkedIn, TikTok, Microsoft, Apple)",
+    "Parallel subagent delegation for full multi-platform audits",
+    "Ads Health Score (0-100) with weighted severity scoring algorithm",
+    "12 industry-specific templates (SaaS, ecommerce, local service, B2B, healthcare, finance, and more)",
+    "AI creative pipeline: brand DNA extraction, campaign brief, image generation, product photography",
+    "PPC financial calculator (CPA, ROAS, break-even, LTV:CAC, budget forecasting)",
+    "A/B test design with statistical significance and sample size calculations",
+    "PDF audit report generation for client deliverables",
+    "MCP server integration for live ad platform API access",
+    "Privacy-first: all analysis runs locally, no data sent to external servers"
+  ],
+  "publicApiSurface": [
+    "/ads audit",
+    "/ads google",
+    "/ads meta",
+    "/ads youtube",
+    "/ads linkedin",
+    "/ads tiktok",
+    "/ads microsoft",
+    "/ads apple",
+    "/ads creative",
+    "/ads landing",
+    "/ads budget",
+    "/ads plan <business-type>",
+    "/ads competitor",
+    "/ads math",
+    "/ads test",
+    "/ads report",
+    "/ads dna <url>",
+    "/ads create",
+    "/ads generate",
+    "/ads photoshoot"
+  ]
+}

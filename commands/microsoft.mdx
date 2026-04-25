@@ -1,0 +1,224 @@
+---
+title: "Microsoft Ads Deep Analysis with /ads microsoft"
+description: "Audit 24 Microsoft Ads checks covering UET tracking, Google import safety, Copilot placements, LinkedIn targeting, and vertical video for Bing search."
+---
+
+The `/ads microsoft` command runs a full Microsoft Ads audit covering Bing search, the Microsoft Audience Network, Copilot chat placements, and LinkedIn profile targeting. It evaluates 24 checks across five weighted categories and produces a `MICROSOFT-ADS-REPORT.md` with a health score, import validation findings, Copilot readiness assessment, and CPC comparison against Google. Microsoft Ads is often treated as a Google import and left unmonitored—the audit surfaces the specific risks and unique opportunities that make it worth dedicated review.
+
+## Scope
+
+`/ads microsoft` covers all major Microsoft Ads campaign and format types:
+
+- Search campaigns on Bing, Yahoo, and syndicated partner networks
+- Performance Max campaigns (up to 300 per account, with LinkedIn profile data integration)
+- Multimedia Ads and Responsive Search Ads
+- Copilot chat placements (73% higher CTR than traditional search)
+- Connected TV inventory: Netflix, Max, Hulu, Roku, discovery+
+- LinkedIn profile targeting across Search, DSA, Shopping, PMax, and Multimedia ads
+- Microsoft-unique extensions: Action Extension, Filter Link Extension, Review Extension
+- Vertical video (9:16, available since April 2025, up to 90 seconds)
+
+## Category breakdown and weights
+
+<Tabs>
+  <Tab title="Technical Setup — 25%">
+    **3 checks: MS01–MS03**
+
+    The foundation for all Microsoft Ads optimization. UET tag health and import validation are the two most common failure points—broken UET means no conversion data, and unvalidated imports can silently corrupt the account.
+
+    | Check | Description | Severity |
+    |-------|-------------|----------|
+    | MS01 | Universal Event Tracking (UET) tag installed and firing on all pages | Critical |
+    | MS02 | Enhanced conversions enabled for improved match rates | High |
+    | MS03 | Google Ads import validated (URLs, conversion goals, extensions, bids all verified) | High |
+
+    <Warning>
+      Scheduled Google Ads auto-imports are one of the most common sources of unexpected Microsoft Ads spend. They can silently re-enable paused campaigns and overwrite manually adjusted bids and budgets. Deactivate scheduled imports immediately after the initial setup and manage imports manually.
+    </Warning>
+
+    **Common import failures to verify:**
+    - Conversion goals often break during import; always re-verify post-import
+    - Tracking templates may not transfer correctly
+    - Extensions may be partially imported
+    - Bid adjustments may not match the source account
+  </Tab>
+  <Tab title="Syndication & Bidding — 20%">
+    **4 checks: MS04–MS07**
+
+    Microsoft's syndicated partner network and the Audience Network require active management. Left on default settings, they can drain budget at CPAs 2–4× higher than Bing search alone.
+
+    | Check | Description | Severity |
+    |-------|-------------|----------|
+    | MS04 | Brand campaigns excluded from syndicated partners, or low-performers regularly excluded | Critical |
+    | MS05 | Audience Network enabled only if testing intentionally; publisher report reviewed weekly | High |
+    | MS06 | Bid strategy targets set 20–35% lower than Google equivalents | High |
+    | MS07 | "Target New Customers" evaluated for eligible PMax campaigns (Beta 2026) | Medium |
+
+    Microsoft search users click paid ads 25% more often than Google users. Average CPC is $1.20–$1.55—20–35% below Google for the same keywords. Bid targets should reflect this discount; importing Google targets directly overpays.
+
+    <Note>
+      The Audience Network commonly delivers CPA 2–4× higher than Bing search for B2B advertisers (Seer Interactive data). It is enabled by default. The audit flags it as a High severity failure if active without a documented weekly publisher report review and exclusion process.
+    </Note>
+  </Tab>
+  <Tab title="Structure & Audience — 20%">
+    **3 checks: MS08–MS10**
+
+    Campaign structure mirrors Google best practices where applicable, but LinkedIn profile targeting is a Microsoft-only opportunity that has no equivalent on any other search platform.
+
+    | Check | Description | Severity |
+    |-------|-------------|----------|
+    | MS08 | Campaign structure follows best practices or mirrors Google structure (if imported) | High |
+    | MS09 | Budget proportional to Bing search volume (typically 20–30% of Google budget) | Medium |
+    | MS10 | LinkedIn profile targeting enabled for B2B campaigns | High |
+
+    **LinkedIn profile targeting impact:**
+    - Up to 16% higher CTR vs non-audience-targeted ads
+    - 64% higher conversion rate vs non-audience-targeted ads
+    - Available dimensions: Company (80,000+), Industry (148 categories), Job Function (26 categories)
+    - CPCs 30–70% cheaper than LinkedIn Ads directly
+
+    The audit recommends starting in Observation (Bid Only) mode to collect performance data by segment before applying bid adjustments.
+  </Tab>
+  <Tab title="Creative & Extensions — 20%">
+    **5 checks: MS11–MS13, MS19–MS20**
+
+    Microsoft offers several creative formats not available on Google. These extensions are unique to the platform and represent incremental reach opportunities that most Google-import accounts miss entirely.
+
+    | Check | Description | Severity |
+    |-------|-------------|----------|
+    | MS11 | RSA asset count: ≥8 headlines, ≥3 descriptions | High |
+    | MS12 | Multimedia Ads tested (rich visual format unique to Microsoft) | Medium |
+    | MS13 | Ad copy optimized for Bing demographics (older, affluent, educated audience) | Medium |
+    | MS19 | Action Extension utilized (predefined clickable CTA buttons) | Medium |
+    | MS20 | Filter Link Extension tested for product/service category deep links | Medium |
+
+    **Microsoft-unique formats:**
+
+    | Format | Description |
+    |--------|-------------|
+    | Action Extension | Predefined action buttons that appear below the headline |
+    | Filter Link Extension | Category-based deep links, ideal for product/service filtering |
+    | Multimedia Ads | Rich visual search ads combining image, headline, and description |
+    | Review Extension | Third-party review quotes displayed in the ad |
+
+    Bing's audience skews significantly older (38% aged 45–64), more educated (34% with degrees), and more affluent (~50% in the top 25% household income bracket). Copy that performs well on Google for younger demographics often underperforms on Bing without adaptation.
+  </Tab>
+  <Tab title="Settings & Performance — 15%">
+    **5 checks: MS14–MS18**
+
+    Performance benchmarking catches the cases where Microsoft Ads is running but delivering poor results—often because Google-imported settings have not been validated against Bing's different traffic profile.
+
+    | Check | Description | Severity |
+    |-------|-------------|----------|
+    | MS14 | Copilot chat placement enabled for PMax campaigns | Medium |
+    | MS15 | Conversion goals configured natively (not relying on unverified imported goals) | High |
+    | MS16 | Microsoft CPC 20–40% lower than Google for same keywords | Medium |
+    | MS17 | Microsoft CVR comparable to Google (flag if >50% lower) | Medium |
+    | MS18 | Impression share tracked for brand and top non-brand terms | Medium |
+
+    **Copilot placement benchmarks:**
+
+    | Metric | Value |
+    |--------|-------|
+    | CTR lift vs traditional search | 73% higher |
+    | CVR lift | 16% stronger |
+    | Customer journey length | 33% shorter |
+    | Purchase intent | 194% more likely to purchase |
+
+    Copilot Checkout launched in January 2026, enabling full in-conversation commerce. Advertisers with PMax campaigns should have Copilot placement enabled to access this inventory.
+  </Tab>
+</Tabs>
+
+## v1.5 checks: import safety, compliance, and video
+
+Four additional checks were added in v1.5 and are scored within the categories above:
+
+| ID | Check | Severity | Category |
+|----|-------|----------|----------|
+| MS-SI1 | Scheduled Google Ads imports disabled or closely monitored | Critical | Technical Setup |
+| MS-CM1 | Consent Mode implemented for EEA/UK/Switzerland (required since May 5, 2025) | High | Technical Setup |
+| MS-CT1 | CTV inventory evaluated for brand and awareness campaigns | Medium | Settings & Performance |
+| MS-VD1 | Vertical video (9:16) tested; Copilot Image Animation evaluated | Medium | Creative & Extensions |
+
+## Copilot integration
+
+Microsoft's Copilot AI represents the largest differentiated opportunity in Microsoft Ads. Unlike traditional search, Copilot conversations involve users who are actively researching and problem-solving—making them significantly higher purchase intent than standard search clicks.
+
+<AccordionGroup>
+  <Accordion title="Copilot Chat Placement">
+    Ads appear within Copilot AI conversations, displayed beneath AI responses with "Sponsored" labels. Available in PMax campaigns. Enable in campaign settings.
+  </Accordion>
+  <Accordion title="Copilot Checkout (January 2026)">
+    Full e-commerce within AI conversations. Launch partners include Urban Outfitters, Etsy, and Ashley Furniture. Enables checkout without leaving the Copilot interface.
+  </Accordion>
+  <Accordion title="Copilot Image Animation (November 2025 pilot)">
+    Converts static image assets to video using AI. Reduces the resource barrier for video ad creation. Evaluate for Multimedia Ads and PMax asset groups.
+  </Accordion>
+  <Accordion title="Auto-generated RSA assets (January 2026)">
+    Microsoft auto-generates RSA headline and description variants by default globally. Enabled for all accounts since January 2026. Delivers a reported 5% CTR increase. Can be reviewed and overridden in the asset library.
+  </Accordion>
+</AccordionGroup>
+
+## Google import safety
+
+Google Ads import is the most common Microsoft Ads setup method—and the most common source of account problems. The audit verifies the following import safety checklist:
+
+- Conversion goals verified post-import (most common failure point)
+- Tracking templates transferred and functioning
+- Extensions fully imported (partial imports are common)
+- Bid adjustments reviewed for Bing-appropriate levels (import targets are typically too high)
+- **Scheduled auto-imports disabled** after initial setup to prevent silent campaign re-enablement
+- Landing page URLs functioning on Microsoft Ads (different click parameters)
+
+<Warning>
+  Scheduled auto-imports are a Critical severity failure if running unmonitored. They can re-enable paused campaigns and overwrite manual bid/budget changes without any notification. Disable scheduled imports after the initial account setup.
+</Warning>
+
+## Key thresholds
+
+| Metric | Pass | Warning | Fail |
+|--------|------|---------|------|
+| Average CPC vs Google | 20–40% lower | 0–20% lower | Equal to or higher |
+| CVR vs Google | Comparable | 25–50% lower | >50% lower |
+| Budget vs Google | 20–30% | 15–40% | &lt;10% or >50% |
+| RSA headlines | ≥8 | 3–7 | &lt;3 |
+| RSA descriptions | ≥3 | 2 | &lt;2 |
+
+## Quick wins
+
+| Check | Fix | Time |
+|-------|-----|------|
+| MS10: LinkedIn targeting | Enable LinkedIn profile targeting for B2B campaigns | 5 min |
+| MS14: Copilot placement | Enable Copilot chat placement in PMax settings | 2 min |
+| MS04: Partner network | Review syndicated partner performance, exclude low-performers | 10 min |
+| MS19: Action Extension | Add Action Extension to campaigns | 5 min |
+| MS12: Multimedia Ads | Create Multimedia Ad from existing image assets | 10 min |
+| MS03: Import validation | Verify conversion goals and tracking post-import | 10 min |
+
+## Microsoft Ads platform context
+
+| Fact | Value |
+|------|-------|
+| Average CPC | $1.20–$1.55 (20–35% discount vs Google) |
+| Average CTR | 2.83–3.1% (higher than Google's ~2.0%) |
+| US desktop market share | 16.75–17.58%; with partners ~25% |
+| Paid ad click rate | 25% higher than Google users |
+| Audience: household income | ~50% in top 25% |
+| Audience: education | 34% with college degrees |
+| Audience: age | 38% aged 45–64 |
+| Copilot CTR lift | 73% higher than traditional search |
+| LinkedIn targeting CTR lift | 16% greater CTR |
+| LinkedIn targeting CVR lift | 64% greater conversion rate |
+| PMax campaign limit | 300 (vs 100 on Google) |
+| CTV inventory | Netflix, Max, Hulu, Roku, discovery+ |
+
+## Output
+
+Running `/ads microsoft` produces:
+
+- **`MICROSOFT-ADS-REPORT.md`**: Full 24-check findings with per-category scores and pass/warning/fail table
+- **Import validation report**: Conversion goal status, tracking template health, extension coverage, and bid adjustment review
+- **Copilot readiness assessment**: Which campaign types are eligible, what assets are needed, and expected CTR/CVR lift
+- **LinkedIn targeting opportunity**: B2B segment recommendations with estimated CTR and CVR improvement
+- **Google CPC benchmark comparison**: Side-by-side for top 10 keywords to confirm the expected 20–40% discount
+- **Quick Wins**: Sorted by severity × estimated impact

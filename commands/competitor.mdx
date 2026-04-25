@@ -1,0 +1,181 @@
+---
+title: "Competitor Ad Intelligence Analysis"
+description: "Research competitor ads across Google, Meta, LinkedIn, and TikTok using free public tools to surface messaging gaps and platform opportunities."
+---
+
+Running `/ads competitor` builds a structured picture of how your competitors advertise across every major platform. Claude uses publicly available intelligence sources — Google Ads Transparency Center, Meta Ad Library, LinkedIn Ad Library, and TikTok Creative Center — to analyze their creative approaches, messaging themes, estimated spend levels, and keyword strategies. The output is a competitive intelligence report with prioritized actions you can take to gain a measurable advantage.
+
+## Command
+
+```bash
+/ads competitor
+```
+
+When running the command, provide the names or URLs of your top three to five competitors. Claude will research their ad presence and structure the analysis around your business type and platform mix.
+
+**Example:**
+
+```bash
+/ads competitor
+
+# When prompted, provide:
+# Competitors: Competitor A (competitora.com), Competitor B, Competitor C
+# Your industry: SaaS
+# Your active platforms: Google, Meta, LinkedIn
+```
+
+## Intelligence sources
+
+Claude uses publicly available tools — no third-party paid subscriptions required.
+
+| Source | Platform | What you can find |
+|--------|----------|------------------|
+| Google Ads Transparency Center | Google | Active ads, formats, geographic targeting, ad history |
+| Meta Ad Library | Meta / Instagram | All active ads, creative, copy, spend ranges, active dates |
+| LinkedIn Ad Library | LinkedIn | Active Sponsored Content and Message Ads by company |
+| TikTok Creative Center 2.0 | TikTok | Top ads by industry, objective, format; trending sounds and hashtags |
+| Google Auction Insights | Google (your account) | Impression share, overlap rate, outranking share vs competitors |
+
+<Info>
+  Google Auction Insights requires access to your own Google Ads account. It shows impression share, overlap rate, and outranking share versus named competitors for Search and Shopping campaigns.
+</Info>
+
+## Analysis framework
+
+### 1. Ad copy analysis
+
+For each competitor, Claude documents:
+
+- **Headlines** — primary messages and value propositions
+- **CTAs** — the action being driven (free trial, demo, buy now, learn more)
+- **Offers** — pricing, discounts, free shipping, trials
+- **Tone** — professional, casual, urgent, educational, emotional
+- **USPs** — unique selling propositions they emphasize
+- **Pain points** — which customer problems they address
+
+### 2. Creative strategy analysis
+
+- **Formats used** — image, video, carousel, collection, document ads
+- **Visual style** — photography, illustration, UGC, stock, branded
+- **Video approach** — studio quality vs UGC vs animated
+- **Creative volume** — number of active ads (indicator of testing velocity)
+- **Refresh frequency** — how often new creatives appear in the library
+
+### 3. Messaging themes
+
+Claude maps competitor messaging onto a theme matrix so you can see which value propositions are saturated and which are underexploited.
+
+| Theme | Competitor A | Competitor B | Your brand |
+|-------|-------------|-------------|------------|
+| Price / Value | Primary | Secondary | ? |
+| Quality / Premium | — | Primary | ? |
+| Speed / Convenience | Secondary | — | ? |
+| Trust / Authority | Primary | Primary | ? |
+| Innovation | — | Secondary | ? |
+
+### 4. Keyword intelligence
+
+For Google, Microsoft, and Apple Ads, Claude analyzes:
+
+- **Brand keyword bidding** — are competitors bidding on your brand terms?
+- **Keyword overlap** — which non-brand terms do you both target?
+- **Keyword gaps** — terms competitors rank for that you're not targeting
+- **Match type strategy** — estimated match types from observed ad triggers
+
+### 5. Spend estimation
+
+Claude estimates competitor spend using available signals and formula-based approximations.
+
+```
+Estimated Monthly Spend = Impressions × CPM / 1,000
+  or
+Estimated Monthly Spend = Clicks × Estimated CPC
+```
+
+Meta Ad Library shows spend ranges for political and social issue ads. Google Auction Insights combined with your own impression share provides directional estimates for Search and Shopping.
+
+## Platform-specific research
+
+<Tabs>
+  <Tab title="Google">
+    Search the Ads Transparency Center by advertiser name or domain to view active campaigns, formats, and geographic targeting. Search competitor brand terms directly in Google to see live ad copy. Use Auction Insights from within your account for impression share comparison.
+  </Tab>
+  <Tab title="Meta">
+    Filter the Meta Ad Library by advertiser name, country, and platform (Facebook or Instagram). View creative (image and video), ad copy, active dates, and placement breakdown. High creative volume signals a brand that's actively testing at scale.
+  </Tab>
+  <Tab title="LinkedIn">
+    Search the LinkedIn Ad Library by company name to see active Sponsored Content and Message Ads. Data is more limited than Meta Ad Library but useful for identifying content themes and offer types. Check whether competitors have adopted Thought Leader Ads (non-employee creator expansion launched March 2025).
+  </Tab>
+  <Tab title="TikTok">
+    Use TikTok Creative Center 2.0 to filter top-performing ads by industry, country, and objective. No per-advertiser library exists — analysis focuses on industry creative trends, trending sounds, and what formats are performing. Check competitor TikTok Shop tabs, product catalogs, and live shopping activity if applicable.
+  </Tab>
+  <Tab title="Apple Ads">
+    Search competitor brand terms directly in the App Store to see their Search tab ads. Check the Today tab for competitor presence. Analyze Custom Product Page variants via their App Store listings to understand how they tailor messaging for different audience segments.
+  </Tab>
+</Tabs>
+
+## Gap and opportunity identification
+
+After documenting competitor activity, Claude identifies four categories of gaps you can move into.
+
+<AccordionGroup>
+  <Accordion title="Platform gaps">
+    Which platforms are competitors not advertising on? Owning a platform your competitors ignore gives you first-mover advantage with that audience. Which platforms are they underspending on where you could outspend and dominate share of voice?
+  </Accordion>
+  <Accordion title="Messaging gaps">
+    What customer pain points are no competitors addressing in their copy? What value propositions appear in zero competitive ads? What content formats — educational series, behind-the-scenes, detailed comparisons — are missing from the competitive landscape?
+  </Accordion>
+  <Accordion title="Audience gaps">
+    What demographic segments or job titles are competitors not targeting? What geographic markets are underserved? Which funnel stages (particularly mid-funnel consideration) are competitors neglecting in favor of only bottom-funnel conversion campaigns?
+  </Accordion>
+  <Accordion title="Creative gaps">
+    What ad formats are competitors not using — video, UGC, Spark Ads, Document Ads? What creative styles are absent from the competitive landscape? What platform-specific features (Thought Leader Ads, TikTok Shop, Custom Product Pages) are competitors not leveraging?
+  </Accordion>
+</AccordionGroup>
+
+## Competitive response strategies
+
+<Tabs>
+  <Tab title="Competitors bid on your brand">
+    Always run brand campaigns to defend your own terms — CPCs are low and CTRs are high. Use dynamic keyword insertion to show your brand prominently in the headline. Add sitelinks to pricing, features, and reviews pages. Emphasize differentiators in ad copy. Consider bidding on competitor brand terms in return, but review platform policies first.
+  </Tab>
+  <Tab title="You're outspent">
+    Focus on efficiency over volume: better targeting, higher-quality creative, stronger landing pages. Target long-tail keywords competitors ignore due to low volume. Use Exact match for precision and reduce wasted spend. Double down on retargeting — lower CPA than prospecting and reaches users already familiar with your brand. Compete on creative quality, not budget.
+  </Tab>
+</Tabs>
+
+## Platform updates to know
+
+<AccordionGroup>
+  <Accordion title="Meta — Andromeda creative clustering (October 2025)">
+    Ads with more than 60% creative similarity are suppressed in Meta's auction. Competitor creative analysis must assess genuine conceptual diversity — not just ad volume. A competitor running 50 near-identical variations is more vulnerable than one running 15 genuinely distinct concepts.
+  </Accordion>
+  <Accordion title="Google — Demand Gen replaced Video Action Campaigns (April 2026)">
+    Video Action Campaigns are fully deprecated. Analyze competitor adoption of Demand Gen (multi-format video and image campaigns) via the Ads Transparency Center. Competitors who have not migrated are likely losing performance.
+  </Accordion>
+  <Accordion title="LinkedIn — Thought Leader Ads expansion (March 2025)">
+    TLA now supports non-employee creators and external influencers, not just company employees. Check whether competitors are sponsoring external thought leaders — this tends to produce CTRs of 1.0–1.5%+ at CPCs of $2.29–$4.14 versus $13+ for standard Sponsored Content.
+  </Accordion>
+  <Accordion title="TikTok — Symphony AI variations (2025)">
+    Assess whether competitors use Symphony AI-generated creative at scale versus original content. High-volume Symphony creative may indicate they're testing aggressively; original creator content tends to outperform at the top of funnel.
+  </Accordion>
+</AccordionGroup>
+
+## Output
+
+Running `/ads competitor` produces two files:
+
+**`COMPETITOR-INTELLIGENCE-REPORT.md`**
+- Per-competitor ad presence summary across all researched platforms
+- Ad copy and messaging analysis
+- Creative strategy comparison
+- Estimated spend levels with methodology notes
+- Keyword overlap and gap analysis
+
+**`COMPETITIVE-GAPS.md`**
+- Platform gaps and first-mover opportunities
+- Messaging angles no competitor is using
+- Audience segments currently underserved
+- Creative format opportunities
+- Strategic recommendations for competitive positioning
+- Priority actions ranked by estimated impact
